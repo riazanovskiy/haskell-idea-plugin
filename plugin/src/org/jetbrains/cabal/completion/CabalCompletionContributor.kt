@@ -25,7 +25,7 @@ public open class CabalCompletionContributor() : CompletionContributor() {
 
             when (parent) {
                 is CabalFile -> {
-                    values.addAll(PKG_DESCR_FIELDS.keys.map({it.concat(":")}))
+                    values.addAll(PKG_DESCR_FIELDS.keys.map({it.plus(":")}))
                     values.addAll(TOP_SECTION_NAMES)
                     caseSensitivity = false
                 }
@@ -37,7 +37,7 @@ public open class CabalCompletionContributor() : CompletionContributor() {
                         }
                         else if (parent.getParent() is InvalidField) {
                             values.addAll(parent.getAvailableValues().map({
-                                if (it in SECTIONS.keys) it else it.concat(":")
+                                if (it in SECTIONS.keys) it else it.plus(":")
                             }))
                             caseSensitivity = false
                         }

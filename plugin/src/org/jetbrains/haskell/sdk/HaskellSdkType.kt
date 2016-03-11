@@ -19,6 +19,9 @@ import org.jetbrains.haskell.util.GHCUtil
 import org.jetbrains.haskell.sdk.HaskellSdkType.SDKInfo
 
 public class HaskellSdkType() : SdkType("GHC") {
+//    override fun createAdditionalDataConfigurable(p0: SdkModel, p1: SdkModificator): AdditionalDataConfigurable? {
+//        throw UnsupportedOperationException()
+//    }
 
     class SDKInfo(val sdkPath : File) {
         val ghcHome: File
@@ -105,18 +108,15 @@ public class HaskellSdkType() : SdkType("GHC") {
         return versionString
     }
 
-    override fun createAdditionalDataConfigurable(sdkModel: SdkModel?,
-                                                  sdkModificator: SdkModificator?): AdditionalDataConfigurable? {
+    override fun createAdditionalDataConfigurable(p0: SdkModel, p1: SdkModificator): AdditionalDataConfigurable? {
         return HaskellSdkConfigurable();
     }
-
 
     override fun saveAdditionalData(additionalData: SdkAdditionalData, additional: Element) {
         if (additionalData is HaskellSdkAdditionalData) {
             additionalData.save(additional)
         }
     }
-
 
     override fun loadAdditionalData(additional: Element?): SdkAdditionalData? {
         return null;//HaskellSdkAdditionalData.load(additional!!);
@@ -136,10 +136,9 @@ public class HaskellSdkType() : SdkType("GHC") {
     override fun setupSdkPaths(sdk: Sdk) {
     }
 
-    override fun isRootTypeApplicable(`type`: OrderRootType?): Boolean {
+    override fun isRootTypeApplicable(type: OrderRootType): Boolean {
         return false
     }
-
 
     companion object {
 

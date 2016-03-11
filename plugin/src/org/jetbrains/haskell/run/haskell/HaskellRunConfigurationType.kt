@@ -33,7 +33,7 @@ public class HaskellRunConfigurationType() : ConfigurationType {
     }
 
     init {
-        this.myFactory = object : ConfigurationFactoryEx(this) {
+        this.myFactory = object : ConfigurationFactoryEx<RunConfiguration>(this) {
             override fun createTemplateConfiguration(project: Project): RunConfiguration {
                 return CabalRunConfiguration(project, this)
             }

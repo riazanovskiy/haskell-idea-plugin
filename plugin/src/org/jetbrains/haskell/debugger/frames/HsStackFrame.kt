@@ -34,7 +34,7 @@ public abstract class HsStackFrame(val debugger: ProcessDebugger,
         setBindingsList(stackFrameInfo.bindings)
     }
 
-    protected fun setBindingsList(bindings: ArrayList<LocalBinding>?) {
+    protected fun setBindingsList(bindings: MutableList<LocalBinding>?) {
         if (bindings != null) {
             bindingsList = XValueChildrenList()
             for (binding in bindings) {

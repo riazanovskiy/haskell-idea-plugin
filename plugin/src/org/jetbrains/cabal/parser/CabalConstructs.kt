@@ -3,7 +3,7 @@ package org.jetbrains.cabal.parser
 import org.jetbrains.cabal.parser.*
 import com.intellij.psi.tree.IElementType
 import kotlin.Pair
-import kotlin.MutableMap
+import kotlin.collections.MutableMap
 import java.util.*
 import org.jetbrains.cabal.parser.CabalTokelTypes as CT
 

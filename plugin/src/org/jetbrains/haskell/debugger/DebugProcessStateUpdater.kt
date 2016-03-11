@@ -12,6 +12,7 @@ import org.jetbrains.haskell.debugger.parser.ParseResult
 import org.jetbrains.haskell.debugger.protocol.AbstractCommand
 import org.jetbrains.haskell.debugger.procdebuggers.ProcessDebugger
 import org.jetbrains.haskell.debugger.config.HaskellDebugSettings
+import java.util.*
 
 /**
  * @author Habibullin Marat
@@ -71,7 +72,9 @@ public class GHCiDebugProcessStateUpdater() : DebugProcessStateUpdater() {
     private fun simpleReadinessCheck(): Boolean = collectedOutput.toString().endsWith(GHCiDebugger.PROMPT_LINE)
 
     private fun handleOutput(oldestExecutedCommand: AbstractCommand<out ParseResult?>?) {
-        oldestExecutedCommand?.handleGHCiOutput(collectedOutput.toString().split('\n').toLinkedList())
+        val deque = ArrayDeque<String>()
+        collectedOutput.toString().split('\n').toCollection(deque)
+        oldestExecutedCommand?.handleGHCiOutput(deque)
         collectedOutput = StringBuilder()
         debugger?.removeOldestExecutedCommand()
     }

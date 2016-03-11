@@ -150,7 +150,7 @@ public class JSONConverter {
                     }
                 }))
 
-        private class InfoSwitch<R: ParseResult>(val info: String) {
+        class InfoSwitch<R: ParseResult>(val info: String) {
             public var someCaseMatched: Boolean = false
             public var result: R? = null
         }

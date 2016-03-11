@@ -41,7 +41,7 @@ public class VersionConstraint(node: ASTNode) : PropertyValue(node), Checkable {
         if (isAny()) return true
 
         if (!isSimple()) {
-            val baseVersion = getVersionValue().get(0, getVersionValue().length - 2) as String
+            val baseVersion = getVersionValue().subSequence(0, getVersionValue().length - 2) as String
             return givenVersion.startsWith(baseVersion)
         }
 

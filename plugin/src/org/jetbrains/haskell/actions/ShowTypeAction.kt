@@ -19,7 +19,7 @@ import com.intellij.openapi.application.ModalityState
  */
 public class ShowTypeAction : AnAction() {
 
-    private data class TypeInfo(
+    data class TypeInfo(
         val startLine: Int,
         val startCol : Int,
         val endLine: Int,

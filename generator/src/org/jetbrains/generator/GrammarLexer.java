@@ -9,7 +9,7 @@ package org.jetbrains.generator;
  * <a href="http://www.jflex.de/">JFlex</a> 1.5.1
  * from the specification file <tt>/home/atsky/work/haskell-idea-plugin/generator/src/org/jetbrains/generator/Generator.flex</tt>
  */
-class GrammarLexer {
+public class GrammarLexer {
 
   /** This character denotes the end of file */
   public static final int YYEOF = -1;
