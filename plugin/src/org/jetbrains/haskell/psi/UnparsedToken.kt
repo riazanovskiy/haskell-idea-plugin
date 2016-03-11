@@ -1,11 +1,9 @@
 package org.jetbrains.haskell.psi
 
-import com.intellij.lang.ASTNode
 import com.intellij.extapi.psi.ASTWrapperPsiElement
-import com.intellij.psi.PsiReference
-import org.jetbrains.haskell.psi.reference.SomeIdReference
+import com.intellij.lang.ASTNode
 
 /**
  * Created by atsky on 4/25/14.
  */
-public class UnparsedToken(node: ASTNode) : ASTWrapperPsiElement(node)
+class UnparsedToken(node: ASTNode) : ASTWrapperPsiElement(node)

@@ -1,7 +1,6 @@
 package org.jetbrains.haskell.external
 
 import org.json.simple.JSONObject
-import org.jetbrains.haskell.external.ErrorMessage.Severity
 
 /**
  * Created by atsky on 17/05/14.
@@ -19,24 +18,23 @@ class ErrorMessage(
     enum class Severity { Error, Warning }
 
     override fun toString(): String {
-        return "Error: " + text + "\n" +
-                "in " + file + " " + line + ":" + column + "-" + eLine + ":" + eColumn;
+        return "Error: $text\nin $file $line:$column-$eLine:$eColumn";
     }
 
     companion object {
         fun fromJson(a : Any) : ErrorMessage {
             val obj = a as JSONObject
-            val text = obj.get("t") as String
-            val severity = obj.get("s") as String
-            val location = obj.get("l") as JSONObject
+            val text = obj["t"] as String
+            val severity = obj["s"] as String
+            val location = obj["l"] as JSONObject
             return ErrorMessage(
                 text,
-                location.get("f") as String,
+                location["f"] as String,
                 if (severity == "Warning") Severity.Warning else Severity.Error,
-                (location.get("l") as Long).toInt(),
-                (location.get("c") as Long).toInt(),
-                (location.get("el") as Long).toInt(),
-                (location.get("ec") as Long).toInt()
+                (location["l"] as Long).toInt(),
+                (location["c"] as Long).toInt(),
+                (location["el"] as Long).toInt(),
+                (location["ec"] as Long).toInt()
             )
         }
     }

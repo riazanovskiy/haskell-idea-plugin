@@ -1,24 +1,20 @@
 package org.jetbrains.cabal.psi
 
 import com.intellij.lang.ASTNode
-import org.jetbrains.cabal.psi.MultiValueField
-import org.jetbrains.cabal.psi.FullVersionConstraint
-import org.jetbrains.cabal.psi.ComplexVersionConstraint
-import org.jetbrains.cabal.psi.Checkable
 import org.jetbrains.cabal.CabalInterface
 import org.jetbrains.cabal.highlight.ErrorMessage
-import java.util.ArrayList
+import java.util.*
 
-public class BuildDependsField(node: ASTNode) : MultiValueField(node), Checkable {
+class BuildDependsField(node: ASTNode) : MultiValueField(node), Checkable {
 
-    public fun getPackageNames(): List<String> = getValues(FullVersionConstraint::class.java).map { it.getBaseName() }
+    fun getPackageNames(): List<String> = getValues(FullVersionConstraint::class.java).map { it.getBaseName() }
 
-    public fun getConstraintsWithName(name: String): List<FullVersionConstraint>
+    fun getConstraintsWithName(name: String): List<FullVersionConstraint>
             = getValues(FullVersionConstraint::class.java).filter { it.getBaseName().equals(name) }
 
-    public override fun check(): List<ErrorMessage> {
+    override fun check(): List<ErrorMessage> {
         val packageConstraints = getValues(FullVersionConstraint::class.java)
-        val installedPackages  = CabalInterface(getProject()).getInstalledPackagesList()
+        val installedPackages  = CabalInterface(project).getInstalledPackagesList()
         var res = ArrayList<ErrorMessage>()
         for (constraint in packageConstraints) {
             val constrName = constraint.getBaseName()
@@ -32,8 +28,7 @@ public class BuildDependsField(node: ASTNode) : MultiValueField(node), Checkable
                 res.add(ErrorMessage(constraint, "this package is not installed", "warning"))
                 continue
             }
-            val versionConstr = constraint.getConstraint()
-            if (versionConstr == null) continue
+            val versionConstr = constraint.getConstraint() ?: continue
             if (!(installed.availableVersions.map({ versionConstr.satisfyConstraint(it) }).reduce { curr, next -> curr || next })) {
                 res.add(ErrorMessage(versionConstr, "installed package's version does not satisfy this constraint", "warning"))
             }

@@ -1,22 +1,19 @@
 package org.jetbrains.cabal.psi
 
 import com.intellij.lang.ASTNode
-import org.jetbrains.cabal.parser.*
-import org.jetbrains.cabal.psi.Name
-import org.jetbrains.cabal.psi.Section
-import java.util.ArrayList
+import org.jetbrains.cabal.parser.FLAG_FIELDS
+import java.util.*
 
-public class Flag(node: ASTNode) : Section(node) {
+class Flag(node: ASTNode) : Section(node) {
 
-    public override fun getAvailableFieldNames(): List<String> {
+    override fun getAvailableFieldNames(): List<String> {
         var res = ArrayList<String>()
         res.addAll(FLAG_FIELDS.keys)
         return res
     }
 
-    public fun getFlagName(): String {
-        val res = getSectName()?.toLowerCase()
-        if (res == null) throw IllegalStateException()
+    fun getFlagName(): String {
+        val res = getSectName()?.toLowerCase() ?: throw IllegalStateException()
         return res
     }
 }

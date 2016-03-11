@@ -1,13 +1,12 @@
 package org.jetbrains.haskell.debugger
 
 import com.intellij.execution.Executor
-import javax.swing.Icon
 import com.intellij.icons.AllIcons
-import org.jetbrains.annotations.NonNls
+import javax.swing.Icon
 
-public class DebugConsoleExecutor(): Executor() {
+class DebugConsoleExecutor(): Executor() {
     companion object {
-        public val EXECUTOR_ID: String = "DebugConsole"
+        val EXECUTOR_ID: String = "DebugConsole"
     }
     override fun getToolWindowId(): String? = "Run"
     override fun getToolWindowIcon(): Icon? = AllIcons.Toolwindows.ToolWindowDebugger

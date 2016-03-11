@@ -1,37 +1,30 @@
 package org.jetbrains.haskell.external
 
-import com.intellij.openapi.project.Project
-import com.intellij.openapi.components.ProjectComponent
-import org.jetbrains.haskell.config.HaskellSettings
-import java.io.InputStream
-import java.io.OutputStream
-import java.io.Writer
-import java.io.InputStreamReader
-import java.io.OutputStreamWriter
-import com.intellij.openapi.module.ModuleManager
-import java.io.File
-import java.util.regex.Pattern
-import java.util.ArrayList
-import com.intellij.notification.Notifications
 import com.intellij.notification.Notification
-import com.intellij.notification.NotificationType
-import com.intellij.openapi.progress.Task
-import com.intellij.openapi.progress.ProgressManager
-import com.intellij.openapi.progress.ProgressIndicator
-import org.jetbrains.haskell.util.ProcessRunner
 import com.intellij.notification.NotificationListener
-import javax.swing.event.HyperlinkEvent
+import com.intellij.notification.NotificationType
+import com.intellij.notification.Notifications
+import com.intellij.openapi.components.ProjectComponent
 import com.intellij.openapi.options.ShowSettingsUtil
+import com.intellij.openapi.progress.ProgressManager
+import com.intellij.openapi.project.Project
 import com.intellij.openapi.roots.ProjectRootManager
 import org.jetbrains.haskell.config.HaskellConfigurable
-import org.jetbrains.haskell.sdk.HaskellSdkType
+import org.jetbrains.haskell.config.HaskellSettings
 import org.jetbrains.haskell.external.tool.GhcModConsole
+import org.jetbrains.haskell.sdk.HaskellSdkType
 import org.jetbrains.haskell.util.OSUtil
+import org.jetbrains.haskell.util.ProcessRunner
+import java.io.File
+import java.io.InputStreamReader
+import java.io.OutputStreamWriter
+import java.util.*
+import javax.swing.event.HyperlinkEvent
 
 /**
  * Created by atsky on 15/06/14.
  */
-public class GhcModi(val project: Project, val settings: HaskellSettings) : ProjectComponent {
+class GhcModi(val project: Project, val settings: HaskellSettings) : ProjectComponent {
     var process: Process? = null;
 
     override fun projectOpened() {}
@@ -41,7 +34,7 @@ public class GhcModi(val project: Project, val settings: HaskellSettings) : Proj
         if (process != null) {
             ProgressManager.getInstance().runProcessWithProgressSynchronously({
                 synchronized(process) {
-                    val output = OutputStreamWriter(process.getOutputStream()!!)
+                    val output = OutputStreamWriter(process.outputStream!!)
                     output.write("\n")
                     output.close()
                     process.waitFor()
@@ -54,18 +47,18 @@ public class GhcModi(val project: Project, val settings: HaskellSettings) : Proj
 
     fun startProcess() {
         assert(process == null)
-        val sdk = ProjectRootManager.getInstance(project).getProjectSdk()
-        val ghcHome = if (sdk != null && sdk.getSdkType() is HaskellSdkType) {
-            sdk.getHomePath() + File.separator + "bin"
+        val sdk = ProjectRootManager.getInstance(project).projectSdk
+        val ghcHome = if (sdk != null && sdk.sdkType is HaskellSdkType) {
+            sdk.homePath + File.separator + "bin"
         } else {
             null
         }
-        process = ProcessRunner(project.getBaseDir()!!.getPath()).getProcess(listOf(getPath()), ghcHome)
+        process = ProcessRunner(project.baseDir!!.path).getProcess(listOf(getPath()), ghcHome)
         GhcModConsole.getInstance(project).append("start ${getPath()}\n", GhcModConsole.MessageType.INFO)
     }
 
     fun getPath(): String {
-        return settings.getState().ghcModiPath!!
+        return settings.state.ghcModiPath!!
     }
 
 
@@ -102,8 +95,8 @@ public class GhcModi(val project: Project, val settings: HaskellSettings) : Proj
             if (process == null) {
                 listOf<String>()
             } else {
-                val input = InputStreamReader(process.getInputStream()!!)
-                val output = OutputStreamWriter(process.getOutputStream()!!)
+                val input = InputStreamReader(process.inputStream!!)
+                val output = OutputStreamWriter(process.outputStream!!)
                 output.write(command + "\n")
                 output.flush()
 
@@ -131,7 +124,7 @@ public class GhcModi(val project: Project, val settings: HaskellSettings) : Proj
                     val hyperlinkHandler = object : NotificationListener.Adapter() {
                         override fun hyperlinkActivated(notification: Notification, e: HyperlinkEvent) {
                             notification.expire()
-                            if (!project.isDisposed()) {
+                            if (!project.isDisposed) {
                                 ShowSettingsUtil.getInstance()?.showSettingsDialog(project, HaskellConfigurable::class.java)
                             }
                         }

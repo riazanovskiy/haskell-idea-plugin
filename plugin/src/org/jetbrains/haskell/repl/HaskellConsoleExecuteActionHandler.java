@@ -1,7 +1,6 @@
 package org.jetbrains.haskell.repl;
 
 import com.intellij.execution.console.LanguageConsoleImpl;
-import com.intellij.execution.console.ProcessBackedConsoleExecuteActionHandler;
 import com.intellij.execution.process.ProcessHandler;
 import com.intellij.openapi.application.Result;
 import com.intellij.openapi.command.WriteCommandAction;

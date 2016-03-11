@@ -1,6 +1,5 @@
 package org.jetbrains.haskell.util;
 
-import com.intellij.openapi.module.Module;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.haskell.run.ModuleComboBoxRenderer;
 

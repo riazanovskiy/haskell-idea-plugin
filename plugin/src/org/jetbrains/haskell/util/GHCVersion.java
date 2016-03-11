@@ -30,7 +30,7 @@ public final class GHCVersion implements Comparable<GHCVersion> {
     public int hashCode() {
         int result = 1;
         for (Integer v : version) {
-            result = 31 * result + v.intValue();
+            result = 31 * result + v;
         }
         return result;
     }

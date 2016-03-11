@@ -2,23 +2,15 @@ package org.jetbrains.haskell.vfs
 
 import com.intellij.openapi.vfs.VirtualFile
 import com.intellij.openapi.vfs.VirtualFileSystem
-import java.io.OutputStream
-import java.io.InputStream
-import org.apache.commons.compress.archivers.ArchiveEntry
-import java.io.FileInputStream
-import java.io.BufferedInputStream
-import org.apache.commons.compress.compressors.gzip.GzipCompressorInputStream
 import org.apache.commons.compress.archivers.tar.TarArchiveInputStream
-import java.io.ByteArrayInputStream
-import org.apache.commons.compress.archivers.tar.TarArchiveEntry
-import java.io.ByteArrayOutputStream
-import java.util.ArrayList
-import java.io.File
+import org.apache.commons.compress.compressors.gzip.GzipCompressorInputStream
+import java.io.*
+import java.util.*
 
 /**
  * Created by atsky on 09/05/14.
  */
-public class TarGzFile(val archiveFile: VirtualFile,
+class TarGzFile(val archiveFile: VirtualFile,
                        val myPath: String) : VirtualFile() {
 
     var isInit = false;
@@ -29,7 +21,7 @@ public class TarGzFile(val archiveFile: VirtualFile,
         if (isInit) {
             return true
         }
-        val archiveIns = archiveFile.getInputStream()
+        val archiveIns = archiveFile.inputStream
         val bin = BufferedInputStream(archiveIns)
         val gzIn = GzipCompressorInputStream(bin);
 
@@ -37,11 +29,8 @@ public class TarGzFile(val archiveFile: VirtualFile,
         val tarArchiveInputStream = TarArchiveInputStream(gzIn)
 
         while (true) {
-            val entry = tarArchiveInputStream.getNextTarEntry();
-            if (entry == null) {
-                break
-            }
-            val entryName = entry.getName() ?: ""
+            val entry = tarArchiveInputStream.nextTarEntry ?: break;
+            val entryName = entry.name ?: ""
             if (myPath == entryName) {
                 myData = readToArray(tarArchiveInputStream)
             } else if (entryName.startsWith(myPath)) {
@@ -76,7 +65,7 @@ public class TarGzFile(val archiveFile: VirtualFile,
     }
 
     override fun getName(): String {
-        val str = if (isDirectory()) {
+        val str = if (isDirectory) {
             myPath.substring(0, myPath.length - 1)
         } else {
             myPath
@@ -88,7 +77,7 @@ public class TarGzFile(val archiveFile: VirtualFile,
     override fun getFileSystem(): VirtualFileSystem = CabalVirtualFileSystem.INSTANCE
 
     override fun getPath(): String =
-            archiveFile.getPath() + "!" + myPath
+            archiveFile.path + "!" + myPath
 
     override fun isWritable() = false
 
@@ -97,7 +86,7 @@ public class TarGzFile(val archiveFile: VirtualFile,
     override fun isValid() = true
 
     override fun getParent(): VirtualFile? {
-        val str = if (isDirectory()) {
+        val str = if (isDirectory) {
             myPath.substring(0, myPath.length - 1)
         } else {
             myPath
@@ -125,11 +114,11 @@ public class TarGzFile(val archiveFile: VirtualFile,
     }
 
     override fun getTimeStamp(): Long {
-        return archiveFile.getTimeStamp()
+        return archiveFile.timeStamp
     }
 
     override fun getModificationStamp(): Long {
-        return archiveFile.getModificationStamp()
+        return archiveFile.modificationStamp
     }
 
     override fun getLength(): Long {

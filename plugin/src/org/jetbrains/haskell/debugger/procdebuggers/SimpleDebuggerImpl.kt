@@ -1,31 +1,12 @@
 package org.jetbrains.haskell.debugger.procdebuggers
 
-import org.jetbrains.haskell.debugger.protocol.CommandCallback
-import org.jetbrains.haskell.debugger.protocol.PrintCommand
-import org.jetbrains.haskell.debugger.protocol.ForceCommand
-import org.jetbrains.haskell.debugger.parser.BreakpointCommandResult
-import org.jetbrains.haskell.debugger.parser.HsStackFrameInfo
-import org.jetbrains.haskell.debugger.parser.ParseResult
-import org.jetbrains.haskell.debugger.protocol.TraceCommand
-import org.jetbrains.haskell.debugger.protocol.StepIntoCommand
-import org.jetbrains.haskell.debugger.protocol.StepOverCommand
-import org.jetbrains.haskell.debugger.protocol.SetBreakpointCommand
-import org.jetbrains.haskell.debugger.protocol.ResumeCommand
-import org.jetbrains.haskell.debugger.protocol.BackCommand
-import org.jetbrains.haskell.debugger.protocol.ForwardCommand
-import org.jetbrains.haskell.debugger.protocol.HistoryCommand
-import org.jetbrains.haskell.debugger.protocol.RemoveBreakpointCommand
-import org.jetbrains.haskell.debugger.protocol.FlowCommand
-import org.jetbrains.haskell.debugger.protocol.StepCommand
-import org.jetbrains.haskell.debugger.parser.MoveHistResult
-import org.jetbrains.haskell.debugger.parser.HistoryResult
-import org.jetbrains.haskell.debugger.protocol.HiddenCommand
-import com.intellij.execution.ui.ConsoleView
 import com.intellij.execution.process.ProcessHandler
+import com.intellij.execution.ui.ConsoleView
+import org.jetbrains.haskell.debugger.parser.*
 import org.jetbrains.haskell.debugger.procdebuggers.utils.DebugRespondent
-import org.jetbrains.haskell.debugger.parser.LocalBinding
+import org.jetbrains.haskell.debugger.protocol.*
 
-public abstract class SimpleDebuggerImpl(val debugRespondent: DebugRespondent,
+abstract class SimpleDebuggerImpl(val debugRespondent: DebugRespondent,
                                          debugProcessHandler: ProcessHandler,
                                          consoleView: ConsoleView?) : QueueDebugger(debugProcessHandler, consoleView) {
 

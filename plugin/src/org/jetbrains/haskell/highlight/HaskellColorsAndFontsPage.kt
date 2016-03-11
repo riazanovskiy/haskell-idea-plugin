@@ -1,19 +1,16 @@
 package org.jetbrains.haskell.highlight
 
-import com.intellij.openapi.editor.DefaultLanguageHighlighterColors
 import com.intellij.openapi.editor.colors.TextAttributesKey
 import com.intellij.openapi.fileTypes.SyntaxHighlighter
 import com.intellij.openapi.options.colors.AttributesDescriptor
 import com.intellij.openapi.options.colors.ColorDescriptor
 import com.intellij.openapi.options.colors.ColorSettingsPage
-import org.jetbrains.annotations.NonNls
 import org.jetbrains.haskell.icons.HaskellIcons
+import java.util.*
+import javax.swing.Icon
 
-import javax.swing.*
-import java.util.HashMap
 
-
-public class HaskellColorsAndFontsPage : ColorSettingsPage {
+class HaskellColorsAndFontsPage : ColorSettingsPage {
     override fun getDisplayName(): String {
         return "Haskell"
     }

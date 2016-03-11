@@ -5,14 +5,12 @@ import com.intellij.openapi.fileTypes.SyntaxHighlighter
 import com.intellij.openapi.options.colors.AttributesDescriptor
 import com.intellij.openapi.options.colors.ColorDescriptor
 import com.intellij.openapi.options.colors.ColorSettingsPage
-import org.jetbrains.annotations.NonNls
 import org.jetbrains.haskell.icons.HaskellIcons
+import java.util.*
+import javax.swing.Icon
 
-import javax.swing.*
-import java.util.HashMap
 
-
-public class CabalColorsAndFontsPage : ColorSettingsPage {
+class CabalColorsAndFontsPage : ColorSettingsPage {
     override fun getDisplayName(): String {
         return "Cabal"
     }

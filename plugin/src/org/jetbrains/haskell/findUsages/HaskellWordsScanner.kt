@@ -1,10 +1,9 @@
 package org.jetbrains.haskell.findUsages
 
-import com.intellij.lang.cacheBuilder.WordsScanner
 import com.intellij.lang.cacheBuilder.DefaultWordsScanner
-import org.jetbrains.haskell.parser.lexer.HaskellLexer
 import com.intellij.psi.tree.TokenSet
 import org.jetbrains.grammar.HaskellLexerTokens
+import org.jetbrains.haskell.parser.lexer.HaskellLexer
 import org.jetbrains.haskell.parser.token.COMMENTS
 
 /**

@@ -1,12 +1,11 @@
 package org.jetbrains.haskell.vfs
 
-import java.io.File
-import java.io.BufferedInputStream
-import java.io.InputStream
-import org.apache.commons.compress.compressors.gzip.GzipCompressorInputStream
 import org.apache.commons.compress.archivers.tar.TarArchiveInputStream
+import org.apache.commons.compress.compressors.gzip.GzipCompressorInputStream
+import java.io.BufferedInputStream
+import java.io.File
 import java.io.FileInputStream
-import java.util.ArrayList
+import java.util.*
 
 /**
  * Created by atsky on 12/12/14.
@@ -24,13 +23,9 @@ class TarGzArchive(val file : File) {
         var file = ArrayList<String>()
 
         while (true) {
-            val entry = tarArchiveInputStream.getNextTarEntry();
+            val entry = tarArchiveInputStream.nextTarEntry ?: break;
 
-            if (entry == null) {
-                break
-            }
-
-            file.add(entry.getName())
+            file.add(entry.name)
         }
         filesList = file;
         bin.close()

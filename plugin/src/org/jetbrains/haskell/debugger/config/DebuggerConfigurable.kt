@@ -1,28 +1,20 @@
 package org.jetbrains.haskell.debugger.config
 
-import com.intellij.openapi.options.Configurable
-import javax.swing.JComponent
-import com.intellij.openapi.ui.ComboBox
-import javax.swing.DefaultComboBoxModel
-import com.intellij.ui.DocumentAdapter
-import javax.swing.event.DocumentEvent
-import java.awt.event.ItemListener
-import java.awt.event.ItemEvent
-import javax.swing.JPanel
-import java.awt.GridBagLayout
-import org.jetbrains.haskell.util.gridBagConstraints
-import java.awt.Insets
-import javax.swing.JLabel
-import org.jetbrains.haskell.util.setConstraints
-import java.awt.GridBagConstraints
-import javax.swing.Box
-import javax.swing.JCheckBox
-import com.intellij.openapi.ui.TextFieldWithBrowseButton
 import com.intellij.openapi.fileChooser.FileChooserDescriptorFactory
+import com.intellij.openapi.options.Configurable
+import com.intellij.openapi.ui.ComboBox
+import com.intellij.openapi.ui.TextFieldWithBrowseButton
+import com.intellij.ui.DocumentAdapter
 import org.jetbrains.haskell.debugger.utils.UIUtils
-import javax.swing.JButton
-import javax.swing.AbstractAction
-import java.awt.event.ActionEvent
+import org.jetbrains.haskell.util.gridBagConstraints
+import java.awt.GridBagConstraints
+import java.awt.GridBagLayout
+import java.awt.event.ItemListener
+import javax.swing.DefaultComboBoxModel
+import javax.swing.JCheckBox
+import javax.swing.JComponent
+import javax.swing.JPanel
+import javax.swing.event.DocumentEvent
 
 /**
  * Manages debugger settings. Creates additional section in IDEA Settings and tracks changes appeared there to obtain
@@ -32,7 +24,7 @@ import java.awt.event.ActionEvent
  *
  * @author Habibullin Marat
  */
-public class DebuggerConfigurable() : Configurable {
+class DebuggerConfigurable() : Configurable {
     companion object {
         private val ITEM_GHCI = "GHCi"
         private val ITEM_REMOTE = "Remote"
@@ -60,18 +52,14 @@ public class DebuggerConfigurable() : Configurable {
                 null,
                 null,
                 FileChooserDescriptorFactory.createSingleLocalFileDescriptor())
-        val itemListener = object : ItemListener {
-            override fun itemStateChanged(e: ItemEvent) {
-                isModified = true
-            }
-        }
+        val itemListener = ItemListener { isModified = true }
         val docListener : DocumentAdapter = object : DocumentAdapter() {
             override fun textChanged(e: DocumentEvent?) {
                 isModified = true
             }
         };
         selectDebuggerComboBox.addItemListener(itemListener)
-        remoteDebuggerPathField.getTextField()!!.getDocument()!!.addDocumentListener(docListener)
+        remoteDebuggerPathField.textField!!.document!!.addDocumentListener(docListener)
         traceSwitchOffCheckBox.addItemListener(itemListener)
         printDebugOutputCheckBox.addItemListener(itemListener)
 
@@ -101,12 +89,12 @@ public class DebuggerConfigurable() : Configurable {
      * debug settings object
      */
     override fun apply() {
-        val ghciSelected = selectDebuggerComboBox.getSelectedIndex() == 0
-        val remotePath = remoteDebuggerPathField.getTextField()!!.getText()
-        val traceSwitchedOff = traceSwitchOffCheckBox.isSelected()
-        val printDebugOutput = printDebugOutputCheckBox.isSelected()
+        val ghciSelected = selectDebuggerComboBox.selectedIndex == 0
+        val remotePath = remoteDebuggerPathField.textField!!.text
+        val traceSwitchedOff = traceSwitchOffCheckBox.isSelected
+        val printDebugOutput = printDebugOutputCheckBox.isSelected
 
-        val state = HaskellDebugSettings.getInstance().getState()
+        val state = HaskellDebugSettings.getInstance().state
         state.debuggerType = if (ghciSelected) DebuggerType.GHCI else DebuggerType.REMOTE
         state.remoteDebuggerPath = remotePath
         state.traceOff = traceSwitchedOff
@@ -120,11 +108,11 @@ public class DebuggerConfigurable() : Configurable {
      * debug settings object
      */
     override fun reset() {
-        val state = HaskellDebugSettings.getInstance().getState()
-        selectDebuggerComboBox.setSelectedIndex(if (state.debuggerType == DebuggerType.GHCI) 0 else 1)
-        traceSwitchOffCheckBox.setSelected(state.traceOff)
-        remoteDebuggerPathField.getTextField()!!.setText(state.remoteDebuggerPath)
-        printDebugOutputCheckBox.setSelected(state.printDebugOutput)
+        val state = HaskellDebugSettings.getInstance().state
+        selectDebuggerComboBox.selectedIndex = if (state.debuggerType == DebuggerType.GHCI) 0 else 1
+        traceSwitchOffCheckBox.isSelected = state.traceOff
+        remoteDebuggerPathField.textField!!.text = state.remoteDebuggerPath
+        printDebugOutputCheckBox.isSelected = state.printDebugOutput
 
         isModified = false
     }

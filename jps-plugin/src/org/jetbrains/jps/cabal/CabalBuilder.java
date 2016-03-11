@@ -86,10 +86,7 @@ public class CabalBuilder extends ModuleLevelBuilder {
                 }
             }
             return ExitCode.OK;
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-            context.processMessage(new CompilerMessage("cabal", BuildMessage.Kind.ERROR, e.getMessage()));
-        } catch (IOException e) {
+        } catch (InterruptedException | IOException e) {
             e.printStackTrace();
             context.processMessage(new CompilerMessage("cabal", BuildMessage.Kind.ERROR, e.getMessage()));
         }

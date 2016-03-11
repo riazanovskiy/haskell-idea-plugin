@@ -2,33 +2,29 @@ package org.jetbrains.haskell.sdk
 
 import com.intellij.openapi.projectRoots.*
 import com.intellij.openapi.roots.OrderRootType
-import com.intellij.openapi.util.IconLoader
 import com.intellij.openapi.util.SystemInfo
 import com.intellij.openapi.util.io.FileUtil
 import org.jdom.Element
-import org.jetbrains.annotations.Nullable
 import org.jetbrains.haskell.icons.HaskellIcons
+import org.jetbrains.haskell.util.GHCUtil
+import org.jetbrains.haskell.util.GHCVersion
 import org.jetbrains.haskell.util.ProcessRunner
-import javax.swing.*
 import java.io.File
 import java.io.FileFilter
-import java.io.FilenameFilter
 import java.util.*
-import org.jetbrains.haskell.util.GHCVersion
-import org.jetbrains.haskell.util.GHCUtil
-import org.jetbrains.haskell.sdk.HaskellSdkType.SDKInfo
+import javax.swing.Icon
 
-public class HaskellSdkType() : SdkType("GHC") {
+class HaskellSdkType() : SdkType("GHC") {
 //    override fun createAdditionalDataConfigurable(p0: SdkModel, p1: SdkModificator): AdditionalDataConfigurable? {
 //        throw UnsupportedOperationException()
 //    }
 
     class SDKInfo(val sdkPath : File) {
         val ghcHome: File
-        val version: GHCVersion = GHCUtil.getVersion(sdkPath.getName())
+        val version: GHCVersion = GHCUtil.getVersion(sdkPath.name)
 
         init {
-            ghcHome = if (SystemInfo.isMac && sdkPath.getAbsolutePath().contains("GHC.framework")) {
+            ghcHome = if (SystemInfo.isMac && sdkPath.absolutePath.contains("GHC.framework")) {
                 File(sdkPath, "usr")
             } else {
                 sdkPath
@@ -40,14 +36,10 @@ public class HaskellSdkType() : SdkType("GHC") {
         val versions: List<File>
         if (SystemInfo.isLinux) {
             val versionsRoot = File("/usr/lib")
-            if (!versionsRoot.isDirectory()) {
+            if (!versionsRoot.isDirectory) {
                 return null
             }
-            versions = (versionsRoot.listFiles(object : FilenameFilter {
-                override fun accept(dir: File, name: String): Boolean {
-                    return name.toLowerCase().startsWith("ghc") && File(dir, name).isDirectory()
-                }
-            })?.toList() ?: listOf())
+            versions = (versionsRoot.listFiles({ dir, name -> name.toLowerCase().startsWith("ghc") && File(dir, name).isDirectory })?.toList() ?: listOf())
         } else if (SystemInfo.isWindows) {
             var progFiles = System.getenv("ProgramFiles(x86)")
             if (progFiles == null) {
@@ -56,28 +48,26 @@ public class HaskellSdkType() : SdkType("GHC") {
             if (progFiles == null)
                 return null
             val versionsRoot = File(progFiles, "Haskell Platform")
-            if (!versionsRoot.isDirectory())
+            if (!versionsRoot.isDirectory)
                 return progFiles
             versions = versionsRoot.listFiles()?.toList() ?: listOf()
         } else if (SystemInfo.isMac) {
             val macVersions = ArrayList<File>()
             val versionsRoot = File("/Library/Frameworks/GHC.framework/Versions/")
-            if (versionsRoot.isDirectory()) {
+            if (versionsRoot.isDirectory) {
                 macVersions.addAll(versionsRoot.listFiles()?.toList() ?: listOf())
             }
             val brewVersionsRoot = File("/usr/local/Cellar/ghc")
-            if (brewVersionsRoot.isDirectory()) {
+            if (brewVersionsRoot.isDirectory) {
                 macVersions.addAll(brewVersionsRoot.listFiles()?.toList() ?: listOf())
             }
             versions = macVersions
         } else {
             return null
         }
-        val latestVersion = getLatestVersion(versions)
-        if (latestVersion == null)
-            return null
+        val latestVersion = getLatestVersion(versions) ?: return null
 
-        return latestVersion.ghcHome.getAbsolutePath()
+        return latestVersion.ghcHome.absolutePath
     }
 
     override fun isValidSdkHome(path: String?): Boolean {
@@ -130,7 +120,7 @@ public class HaskellSdkType() : SdkType("GHC") {
     }
 
     override fun getIconForAddAction(): Icon {
-        return getIcon()
+        return icon
     }
 
     override fun setupSdkPaths(sdk: Sdk) {
@@ -142,7 +132,7 @@ public class HaskellSdkType() : SdkType("GHC") {
 
     companion object {
 
-        public val INSTANCE: HaskellSdkType = HaskellSdkType()
+        val INSTANCE: HaskellSdkType = HaskellSdkType()
         private val GHC_ICON: Icon = HaskellIcons.HASKELL
 
         fun getBinDirectory(path: String) :  File {
@@ -160,34 +150,28 @@ public class HaskellSdkType() : SdkType("GHC") {
             for (name in sdkPaths) {
                 ghcDirs.add(SDKInfo(name))
             }
-            Collections.sort(ghcDirs, object : Comparator<SDKInfo> {
-                override fun compare(d1: SDKInfo, d2: SDKInfo): Int {
-                    return d1.version.compareTo(d2.version)
-                }
-            })
-            return ghcDirs.get(ghcDirs.size - 1)
+            Collections.sort(ghcDirs, { d1, d2 -> d1.version.compareTo(d2.version) })
+            return ghcDirs[ghcDirs.size - 1]
         }
 
-        public fun checkForGhc(path: String): Boolean {
+        fun checkForGhc(path: String): Boolean {
             val bin = getBinDirectory(path)
-            if (!bin.isDirectory())
+            if (!bin.isDirectory)
                 return false
-            val children = bin.listFiles(object : FileFilter {
-                override fun accept(f: File): Boolean {
-                    if (f.isDirectory())
-                        return false
-                    return "ghc".equals(FileUtil.getNameWithoutExtension(f), ignoreCase = true)
-                }
+            val children = bin.listFiles(FileFilter { f ->
+                if (f.isDirectory)
+                    return@FileFilter false
+                "ghc".equals(FileUtil.getNameWithoutExtension(f), ignoreCase = true)
             })
             return children != null && children.size >= 1
         }
 
-        public fun getGhcVersion(homePath: String?): String? {
-            if (homePath == null || !File(homePath).isDirectory()) {
+        fun getGhcVersion(homePath: String?): String? {
+            if (homePath == null || !File(homePath).isDirectory) {
                 return null
             }
             try {
-                val cmd = getBinDirectory(homePath).getAbsolutePath() + File.separator + "ghc"
+                val cmd = getBinDirectory(homePath).absolutePath + File.separator + "ghc"
                 return ProcessRunner(null).executeOrFail(cmd, "--numeric-version").trim()
             } catch (ex: Exception) {
                 // ignore

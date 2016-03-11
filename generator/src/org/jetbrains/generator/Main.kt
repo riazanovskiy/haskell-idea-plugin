@@ -16,10 +16,7 @@ import org.jetbrains.generator.grammar.RuleRef
 fun getTokens(lexer : GrammarLexer) : List<Token> {
     val list = ArrayList<Token>();
     while (true) {
-        val tokenType = lexer.yylex()
-        if (tokenType == null) {
-            break
-        }
+        val tokenType = lexer.yylex() ?: break
         if (tokenType == TokenType.BLOCK_COMMENT) {
             continue
         }

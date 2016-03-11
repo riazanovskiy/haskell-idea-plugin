@@ -1,17 +1,12 @@
 package org.jetbrains.haskell.external
 
-import org.jetbrains.haskell.util.ProcessRunner
-import java.io.IOException
-import com.intellij.util.messages.MessageBus
-import com.intellij.util.MessageBusUtil
-import com.intellij.notification.Notifications
 import com.intellij.notification.Notification
 import com.intellij.notification.NotificationType
-import java.io.File
-import org.jetbrains.haskell.util.OSUtil
+import com.intellij.notification.Notifications
 import org.jetbrains.haskell.config.HaskellSettings
-import java.util.Collections
-import java.util.HashMap
+import org.jetbrains.haskell.util.ProcessRunner
+import java.io.IOException
+import java.util.*
 
 
 /**
@@ -22,7 +17,7 @@ object GhcMod {
     var errorReported : Boolean = false
 
     fun getPath() : String {
-        return HaskellSettings.getInstance().getState().ghcModPath!!
+        return HaskellSettings.getInstance().state.ghcModPath!!
     }
 
     fun getModuleContent(module : String) : List<Pair<String, String?>> {

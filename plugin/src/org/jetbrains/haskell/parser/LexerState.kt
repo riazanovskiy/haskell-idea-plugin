@@ -1,22 +1,14 @@
 package org.jetbrains.haskell.parser
 
+import com.intellij.lang.PsiBuilder
+import com.intellij.psi.TokenType
 import com.intellij.psi.tree.IElementType
 import org.jetbrains.grammar.HaskellLexerTokens
-import java.util.Arrays
-import java.util.HashSet
-import java.util.ArrayList
 import org.jetbrains.haskell.parser.lexer.HaskellLexer
-import com.intellij.psi.TokenType
-import org.jetbrains.haskell.parser.token.NEW_LINE
-import org.jetbrains.haskell.parser.token.END_OF_LINE_COMMENT
-import org.jetbrains.haskell.parser.token.BLOCK_COMMENT
-import java.io.PrintStream
-import com.intellij.lang.PsiBuilder
-import com.intellij.lang.WhitespaceSkippedCallback
-import org.jetbrains.grammar.dumb.NonTerminalTree
-import org.jetbrains.grammar.dumb.TerminalTree
-import org.jetbrains.haskell.parser.token.PRAGMA
 import org.jetbrains.haskell.parser.token.COMMENTS
+import org.jetbrains.haskell.parser.token.NEW_LINE
+import java.io.PrintStream
+import java.util.*
 
 val INDENT_TOKENS = HashSet<IElementType>(Arrays.asList(
         HaskellLexerTokens.DO,
@@ -28,7 +20,7 @@ val INDENT_TOKENS = HashSet<IElementType>(Arrays.asList(
 class IntStack(val indent: Int,
                val parent: IntStack?)
 
-public fun getCachedTokens(lexer: HaskellLexer, stream: PrintStream?): CachedTokens {
+fun getCachedTokens(lexer: HaskellLexer, stream: PrintStream?): CachedTokens {
     val tokens = ArrayList<IElementType>()
     val starts = ArrayList<Int>()
     val indents = ArrayList<Int>()
@@ -38,8 +30,8 @@ public fun getCachedTokens(lexer: HaskellLexer, stream: PrintStream?): CachedTok
     var isLineStart = true
 
     stream?.println("-------------------")
-    while (lexer.getTokenType() != null) {
-        val tokenType = lexer.getTokenType()!!
+    while (lexer.tokenType != null) {
+        val tokenType = lexer.tokenType!!
         if (!COMMENTS.contains(tokenType) && tokenType != TokenType.WHITE_SPACE) {
             if (tokenType == NEW_LINE) {
                 currentIndent = 0
@@ -47,16 +39,16 @@ public fun getCachedTokens(lexer: HaskellLexer, stream: PrintStream?): CachedTok
                 stream?.println()
             } else {
                 tokens.add(tokenType)
-                starts.add(lexer.getTokenStart())
+                starts.add(lexer.tokenStart)
                 indents.add(currentIndent)
                 lineStarts.add(isLineStart)
                 isLineStart = false
-                stream?.print("${tokenType} ")
+                stream?.print("$tokenType ")
             }
         }
 
         if (tokenType != NEW_LINE) {
-            for (ch in lexer.getTokenText()) {
+            for (ch in lexer.tokenText) {
                 if (ch == '\t') {
                     currentIndent += 8;
                 } else {
@@ -70,7 +62,7 @@ public fun getCachedTokens(lexer: HaskellLexer, stream: PrintStream?): CachedTok
     return CachedTokens(tokens, starts, indents, lineStarts)
 }
 
-public fun getCachedTokens(builder: PsiBuilder): CachedTokens {
+fun getCachedTokens(builder: PsiBuilder): CachedTokens {
     val tokens = ArrayList<IElementType>()
     val starts = ArrayList<Int>()
     val indents = ArrayList<Int>()
@@ -79,33 +71,30 @@ public fun getCachedTokens(builder: PsiBuilder): CachedTokens {
     var currentIndent = 0
     var isLineStart = true
 
-    builder.setWhitespaceSkippedCallback(object : WhitespaceSkippedCallback {
-        override fun onSkip(type: IElementType?, start: Int, end: Int) {
-            if (type == NEW_LINE) {
-                currentIndent = 0
-                isLineStart = true
-            } else {
-                val charSequence = builder.getOriginalText()
-                for (i in start..(end-1)) {
-                    if (charSequence[i] == '\t') {
-                        currentIndent += 8;
-                    } else {
-                        currentIndent += 1;
-                    }
+    builder.setWhitespaceSkippedCallback({ type, start, end ->
+        if (type == NEW_LINE) {
+            currentIndent = 0
+            isLineStart = true
+        } else {
+            val charSequence = builder.originalText
+            for (i in start..(end-1)) {
+                if (charSequence[i] == '\t') {
+                    currentIndent += 8;
+                } else {
+                    currentIndent += 1;
                 }
             }
         }
-
     })
 
-    while (builder.getTokenType() != null) {
-        tokens.add(builder.getTokenType()!!)
-        starts.add(builder.getCurrentOffset())
+    while (builder.tokenType != null) {
+        tokens.add(builder.tokenType!!)
+        starts.add(builder.currentOffset)
         indents.add(currentIndent)
         lineStarts.add(isLineStart)
         isLineStart = false
 
-        currentIndent += builder.getTokenText()!!.length
+        currentIndent += builder.tokenText!!.length
 
         builder.advanceLexer()
     }
@@ -113,7 +102,7 @@ public fun getCachedTokens(builder: PsiBuilder): CachedTokens {
     return CachedTokens(tokens, starts, indents, lineStarts)
 }
 
-public fun newLexerState(tokens: CachedTokens): LexerState {
+fun newLexerState(tokens: CachedTokens): LexerState {
     if (tokens.tokens.firstOrNull() == HaskellLexerTokens.MODULE) {
         return LexerState(tokens, 0, 0, null, null)
     } else {
@@ -121,13 +110,13 @@ public fun newLexerState(tokens: CachedTokens): LexerState {
     }
 }
 
-public class CachedTokens(val tokens: List<IElementType>,
+class CachedTokens(val tokens: List<IElementType>,
                           val starts: List<Int>,
                           val indents: ArrayList<Int>,
                           val lineStart: ArrayList<Boolean>) {
 }
 
-public class LexerState(val tokens: CachedTokens,
+class LexerState(val tokens: CachedTokens,
                         val position: Int,
                         val readedLexemNumber: Int,
                         val currentToken: HaskellTokenType?,

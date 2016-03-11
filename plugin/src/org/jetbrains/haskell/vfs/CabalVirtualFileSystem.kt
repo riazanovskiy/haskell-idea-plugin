@@ -1,17 +1,16 @@
 package org.jetbrains.haskell.vfs
 
-import com.intellij.openapi.vfs.newvfs.NewVirtualFileSystem
-import com.intellij.openapi.vfs.VirtualFile
 import com.intellij.openapi.util.io.FileAttributes
-import java.io.InputStream
-import java.io.OutputStream
 import com.intellij.openapi.util.io.FileUtil
 import com.intellij.openapi.vfs.LocalFileSystem
+import com.intellij.openapi.vfs.VirtualFile
+import com.intellij.openapi.vfs.newvfs.NewVirtualFileSystem
+import java.io.OutputStream
 
 /**
  * Created by atsky on 09/05/14.
  */
-public class CabalVirtualFileSystem() : NewVirtualFileSystem() {
+class CabalVirtualFileSystem() : NewVirtualFileSystem() {
 
     fun getTarGzRootForLocalFile(entryVFile : VirtualFile) : VirtualFile {
 
@@ -28,9 +27,9 @@ public class CabalVirtualFileSystem() : NewVirtualFileSystem() {
         throw UnsupportedOperationException()
     }
 
-    override fun isDirectory(file: VirtualFile) = file.isDirectory()
+    override fun isDirectory(file: VirtualFile) = file.isDirectory
 
-    override fun getTimeStamp(file: VirtualFile): Long = file.getTimeStamp()
+    override fun getTimeStamp(file: VirtualFile): Long = file.timeStamp
 
     override fun setTimeStamp(file: VirtualFile, timeStamp: Long) {
         throw UnsupportedOperationException()
@@ -43,11 +42,11 @@ public class CabalVirtualFileSystem() : NewVirtualFileSystem() {
     }
 
     override fun contentsToByteArray(file: VirtualFile): ByteArray {
-        val stream = file.getInputStream()!!
-        return FileUtil.loadBytes(stream, file.getLength().toInt())
+        val stream = file.inputStream!!
+        return FileUtil.loadBytes(stream, file.length.toInt())
     }
 
-    override fun getInputStream(file: VirtualFile) = file.getInputStream()!!
+    override fun getInputStream(file: VirtualFile) = file.inputStream!!
 
     override fun getOutputStream(file: VirtualFile,
                                  requestor: Any?,
@@ -56,7 +55,7 @@ public class CabalVirtualFileSystem() : NewVirtualFileSystem() {
         throw UnsupportedOperationException()
     }
 
-    override fun getLength(file: VirtualFile) = file.getLength()
+    override fun getLength(file: VirtualFile) = file.length
 
     override fun getProtocol(): String = "tar"
 
@@ -118,6 +117,6 @@ public class CabalVirtualFileSystem() : NewVirtualFileSystem() {
     }
 
     companion object {
-        public val INSTANCE : CabalVirtualFileSystem = CabalVirtualFileSystem()
+        val INSTANCE : CabalVirtualFileSystem = CabalVirtualFileSystem()
     }
 }

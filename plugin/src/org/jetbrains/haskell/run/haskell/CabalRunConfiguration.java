@@ -37,7 +37,7 @@ public final class CabalRunConfiguration extends ModuleBasedConfiguration<RunCon
     private String myWorkingDir;
     private String myExecutableName;
     private String myProgramParameters;
-    private Map<String, String> myEnvs = new HashMap<String, String>();
+    private Map<String, String> myEnvs = new HashMap<>();
 
     public CabalRunConfiguration(String name, Project project, ConfigurationFactory factory) {
         super(name, new RunConfigurationModule(project), factory);

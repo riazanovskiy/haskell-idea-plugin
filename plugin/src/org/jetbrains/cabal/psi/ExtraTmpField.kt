@@ -1,13 +1,10 @@
 package org.jetbrains.cabal.psi
 
 import com.intellij.lang.ASTNode
-import org.jetbrains.cabal.psi.MultiValueField
-import org.jetbrains.cabal.psi.PathsField
 import com.intellij.openapi.vfs.VirtualFile
-import org.jetbrains.cabal.highlight.ErrorMessage
 
-public class ExtraTmpField(node: ASTNode) : MultiValueField(node), PathsField {
+class ExtraTmpField(node: ASTNode) : MultiValueField(node), PathsField {
 
-    public override fun validVirtualFile(file: VirtualFile): Boolean = true
+    override fun validVirtualFile(file: VirtualFile): Boolean = true
 
 }

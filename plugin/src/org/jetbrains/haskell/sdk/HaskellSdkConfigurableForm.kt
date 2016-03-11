@@ -9,12 +9,12 @@ import com.intellij.ui.DocumentAdapter
 import javax.swing.event.DocumentEvent
 import com.intellij.openapi.ui.TextFieldWithBrowseButton
 
-public open class HaskellSdkConfigurableForm() {
-    public var isModified: Boolean = false
+open class HaskellSdkConfigurableForm() {
+    var isModified: Boolean = false
     private val cabalPathField: TextFieldWithBrowseButton = TextFieldWithBrowseButton()
     private val cabalLibPathField: TextFieldWithBrowseButton = TextFieldWithBrowseButton()
 
-    public open fun getContentPanel(): JComponent {
+    open fun getContentPanel(): JComponent {
         val panel = JPanel(GridBagLayout())
 
         val base = gridBagConstraints {
@@ -29,8 +29,8 @@ public open class HaskellSdkConfigurableForm() {
 
         };
 
-        cabalPathField.getTextField()!!.getDocument()!!.addDocumentListener(listener)
-        cabalLibPathField.getTextField()!!.getDocument()!!.addDocumentListener(listener)
+        cabalPathField.textField!!.document!!.addDocumentListener(listener)
+        cabalLibPathField.textField!!.document!!.addDocumentListener(listener)
 
         panel.add(JLabel("Cabal executable path"), base.setConstraints {
             anchor = GridBagConstraints.LINE_START
@@ -75,16 +75,16 @@ public open class HaskellSdkConfigurableForm() {
 
     }
 
-    public open fun getCabalPath(): String {
-        return cabalPathField.getText()!!
+    open fun getCabalPath(): String {
+        return cabalPathField.text!!
     }
-    public open fun getCabalLibPath(): String {
-        return cabalLibPathField.getText()!!
+    open fun getCabalLibPath(): String {
+        return cabalLibPathField.text!!
     }
 
-    public open fun init(cabalPath : String, cabalLibPath : String): Unit {
-        this.cabalPathField.setText(cabalPath)
-        this.cabalLibPathField.setText(cabalLibPath)
+    open fun init(cabalPath : String, cabalLibPath : String): Unit {
+        this.cabalPathField.text = cabalPath
+        this.cabalLibPathField.text = cabalLibPath
     }
 
 

@@ -1,13 +1,11 @@
 package org.jetbrains.haskell.sdk
 
-import com.intellij.openapi.options.ConfigurationException
 import com.intellij.openapi.projectRoots.SdkAdditionalData
-import com.intellij.openapi.projectRoots.SdkModel
 import org.jdom.Element
 import org.jetbrains.haskell.util.OSUtil
 
 
-public class HaskellSdkAdditionalData(cabalPath: String?,
+class HaskellSdkAdditionalData(cabalPath: String?,
                                       cabalLibPath: String?) : SdkAdditionalData, Cloneable {
 
 
@@ -15,11 +13,11 @@ public class HaskellSdkAdditionalData(cabalPath: String?,
     private var myCabalDataPath: String? = cabalLibPath
 
 
-    public override fun clone() : Any {
-        return super<Cloneable>.clone()
+    override fun clone() : Any {
+        return super.clone()
     }
 
-    public fun save(element: Element): Unit {
+    fun save(element: Element): Unit {
         if (myCabalPath != null) {
             element.setAttribute(CABAL_PATH, myCabalPath!!)
         }
@@ -28,15 +26,15 @@ public class HaskellSdkAdditionalData(cabalPath: String?,
         }
     }
 
-    public fun getCabalPath(): String {
+    fun getCabalPath(): String {
         return if (myCabalPath == null) "" else myCabalPath!!
     }
 
-    public fun getCabalDataPath(): String {
+    fun getCabalDataPath(): String {
         return if (myCabalDataPath == null) "" else myCabalDataPath!!
     }
 
-    public fun setCabalPath(cabalPath: String?): Unit {
+    fun setCabalPath(cabalPath: String?): Unit {
         this.myCabalPath = cabalPath
     }
 
@@ -53,7 +51,7 @@ public class HaskellSdkAdditionalData(cabalPath: String?,
             return OSUtil.getCabalData()
         }
 
-        public fun load(element: Element): HaskellSdkAdditionalData {
+        fun load(element: Element): HaskellSdkAdditionalData {
             val data = HaskellSdkAdditionalData(null, null)
             data.myCabalPath = element.getAttributeValue(CABAL_PATH) ?: getDefaultCabalPath()
             data.myCabalDataPath = element.getAttributeValue(CABAL_DATA_PATH) ?: getDefaultCabalDataPath()

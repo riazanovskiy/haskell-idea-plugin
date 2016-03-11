@@ -1,30 +1,29 @@
 package org.jetbrains.haskell.debugger.frames
 
-import com.intellij.xdebugger.XSourcePosition
-import com.intellij.xdebugger.frame.XStackFrame
+import com.intellij.icons.AllIcons
+import com.intellij.openapi.application.ApplicationManager
+import com.intellij.openapi.vfs.LocalFileSystem
+import com.intellij.ui.ColoredTextContainer
 import com.intellij.ui.SimpleTextAttributes
+import com.intellij.xdebugger.XDebuggerBundle
+import com.intellij.xdebugger.XDebuggerUtil
+import com.intellij.xdebugger.XSourcePosition
 import com.intellij.xdebugger.evaluation.XDebuggerEvaluator
 import com.intellij.xdebugger.frame.XCompositeNode
-import com.intellij.openapi.application.ApplicationManager
+import com.intellij.xdebugger.frame.XStackFrame
 import com.intellij.xdebugger.frame.XValueChildrenList
-import com.intellij.xdebugger.XDebuggerUtil
-import com.intellij.openapi.vfs.LocalFileSystem
-import java.io.File
-import org.jetbrains.haskell.debugger.parser.LocalBinding
-import java.util.ArrayList
-import com.intellij.ui.ColoredTextContainer
-import com.intellij.icons.AllIcons
-import com.intellij.xdebugger.XDebuggerBundle
 import org.jetbrains.haskell.debugger.parser.HsStackFrameInfo
+import org.jetbrains.haskell.debugger.parser.LocalBinding
 import org.jetbrains.haskell.debugger.procdebuggers.ProcessDebugger
+import java.io.File
 
-public abstract class HsStackFrame(val debugger: ProcessDebugger,
-                                   public val stackFrameInfo: HsStackFrameInfo) : XStackFrame() {
+abstract class HsStackFrame(val debugger: ProcessDebugger,
+                                   val stackFrameInfo: HsStackFrameInfo) : XStackFrame() {
     companion object {
         private val STACK_FRAME_EQUALITY_OBJECT = Object()
     }
 
-    public var obsolete: Boolean = true
+    var obsolete: Boolean = true
 
     override fun getEqualityObject(): Any? = STACK_FRAME_EQUALITY_OBJECT
 
@@ -57,7 +56,7 @@ public abstract class HsStackFrame(val debugger: ProcessDebugger,
     /**
      * This property holds XSourcePosition value. Use it instead of getSourcePosition()
      */
-    public val hackSourcePosition: XSourcePosition?
+    val hackSourcePosition: XSourcePosition?
         get() {
             if (!_sourcePositionSet) {
                 _hackSourcePosition = if (stackFrameInfo.filePosition == null) null else
@@ -85,7 +84,7 @@ public abstract class HsStackFrame(val debugger: ProcessDebugger,
                 component.append(stackFrameInfo.functionName, SimpleTextAttributes.REGULAR_BOLD_ATTRIBUTES)
                 component.append(" (", SimpleTextAttributes.REGULAR_ATTRIBUTES)
             }
-            component.append(position.getFile().getName() + ":", SimpleTextAttributes.REGULAR_ATTRIBUTES)
+            component.append(position.file.name + ":", SimpleTextAttributes.REGULAR_ATTRIBUTES)
             setSourceSpan(component)
             if (stackFrameInfo.functionName != null) {
                 component.append(")", SimpleTextAttributes.REGULAR_ATTRIBUTES)
@@ -102,24 +101,21 @@ public abstract class HsStackFrame(val debugger: ProcessDebugger,
      * added HsDebugValue instances are shown in 'Variables' panel of 'Debug' tool window.
      */
     override fun computeChildren(node: XCompositeNode) {
-        if (node.isObsolete()) {
+        if (node.isObsolete) {
             return
         }
-        ApplicationManager.getApplication()!!.executeOnPooledThread(object : Runnable {
-            override fun run() {
-                try {
-                    if (bindingsList == null || obsolete) {
-                        tryGetBindings()
-                        obsolete = false
-                    }
-                    if (bindingsList != null) {
-                        node.addChildren(bindingsList as XValueChildrenList, true)
-                    }
-                } catch (e: Exception) {
-                    e.printStackTrace()
-                    node.setErrorMessage("Unable to display frame variables")
+        ApplicationManager.getApplication()!!.executeOnPooledThread({
+            try {
+                if (bindingsList == null || obsolete) {
+                    tryGetBindings()
+                    obsolete = false
                 }
-
+                if (bindingsList != null) {
+                    node.addChildren(bindingsList as XValueChildrenList, true)
+                }
+            } catch (e: Exception) {
+                e.printStackTrace()
+                node.setErrorMessage("Unable to display frame variables")
             }
         })
     }

@@ -19,18 +19,14 @@ import com.intellij.openapi.roots.ProjectRootManager
 import org.jetbrains.haskell.sdk.HaskellSdkType
 
 
-public class HaskellProjectComponent(val project: Project) : ProjectComponent {
+class HaskellProjectComponent(val project: Project) : ProjectComponent {
     companion object {
         val GHC_PATH_NOT_FOUND = "ghc not found in PATH. It can cause issues."+
                                  " Please spicify haskell SDK for project."
     }
 
     fun invokeInUI(block: () -> Unit) {
-        UIUtil.invokeAndWaitIfNeeded(object : Runnable {
-            override fun run() {
-                block()
-            }
-        });
+        UIUtil.invokeAndWaitIfNeeded(Runnable { block() });
     }
 
     fun packageNotFound(pkg: String) {
@@ -52,16 +48,16 @@ public class HaskellProjectComponent(val project: Project) : ProjectComponent {
 
     fun getHaskellModules(): List<Module> {
         val moduleManager = ModuleManager.getInstance(project)!!
-        return moduleManager.getModules().filter { ModuleType.get(it) == HaskellModuleType.INSTANCE }
+        return moduleManager.modules.filter { ModuleType.get(it) == HaskellModuleType.INSTANCE }
     }
 
     override fun projectOpened() {
         if (!getHaskellModules().isEmpty()) {
             val paths = System.getenv("PATH")!!.split(File.pathSeparator.toRegex()).toTypedArray().toMutableList()
 
-            val sdk = ProjectRootManager.getInstance(project).getProjectSdk()
-            if (sdk != null && sdk.getSdkType() is HaskellSdkType) {
-                paths.add(sdk.getHomePath() + File.separator + "bin")
+            val sdk = ProjectRootManager.getInstance(project).projectSdk
+            if (sdk != null && sdk.sdkType is HaskellSdkType) {
+                paths.add(sdk.homePath + File.separator + "bin")
             }
 
             if (OSUtil.isMac) {
@@ -122,7 +118,7 @@ public class HaskellProjectComponent(val project: Project) : ProjectComponent {
     @Deprecated("")
     private fun removeTempDir() {
         for (module in getHaskellModules()) {
-            val path = module.getModuleFile()?.getParent()?.getPath()
+            val path = module.moduleFile?.parent?.path
             if (path != null) {
                 val buildWrapperPath = File(path, ".buildwrapper")
                 if (buildWrapperPath.exists()) {

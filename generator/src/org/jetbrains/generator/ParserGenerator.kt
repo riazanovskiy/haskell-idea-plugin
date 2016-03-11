@@ -1,15 +1,9 @@
 package org.jetbrains.generator
 
-import java.io.FileReader
-import java.util.ArrayList
-import org.jetbrains.generator.grammar.TokenDescription
-import java.io.PrintStream
+import org.jetbrains.generator.grammar.*
 import java.io.File
 import java.io.FileWriter
-import org.jetbrains.generator.grammar.*
-import java.util.HashMap
-import java.util.HashSet
-import java.util.TreeSet
+import java.util.*
 
 /**
  * Created by atsky on 11/7/14.
@@ -65,7 +59,7 @@ class ParserGenerator(val grammar: Grammar) {
             indent {
                 for (token in tokens) {
                     val name = token.name.toUpperCase()
-                    line("public static HaskellTokenType ${name} = new HaskellTokenType(\"${token.text}\");");
+                    line("public static HaskellTokenType $name = new HaskellTokenType(\"${token.text}\");");
                 }
             }
             line("}")
@@ -96,7 +90,7 @@ class ParserGenerator(val grammar: Grammar) {
             line()
             line()
             for (element in elementSet) {
-                line("public val ${camelCaseToUpperCase(element)} : IElementType = HaskellCompositeElementType(\"${element}\", ::${element})")
+                line("public val ${camelCaseToUpperCase(element)} : IElementType = HaskellCompositeElementType(\"$element\", ::$element)")
             }
         }
 
@@ -209,9 +203,9 @@ class ParserGenerator(val grammar: Grammar) {
             fillVariant(builder, variant)
 
             if (variant is NonFinalVariant && variant.atom.toString() == rule.name) {
-                line("addVar(left, ${builder});")
+                line("addVar(left, $builder);")
             } else {
-                line("addVar(variants, ${builder});")
+                line("addVar(variants, $builder);")
             }
         }
     }

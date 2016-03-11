@@ -22,26 +22,26 @@ import org.jetbrains.haskell.debugger.frames.HsDebugValue
 import org.jetbrains.haskell.debugger.protocol.CommandCallback
 import org.junit.Assert
 
-public abstract class DebuggerTest<T : ProcessDebugger> {
+abstract class DebuggerTest<T : ProcessDebugger> {
 
     companion object {
 
-        public val PROPERTIES_FILE: String = "unittest.properties"
-        public val TEST_MODULE_FILE: String = "TestMain.hs"
+        val PROPERTIES_FILE: String = "unittest.properties"
+        val TEST_MODULE_FILE: String = "TestMain.hs"
 
-        public val MAIN_LINE: Int = 10
-        public val QSORT_LINE: Int = 6
+        val MAIN_LINE: Int = 10
+        val QSORT_LINE: Int = 6
 
-        public var properties: Properties? = null
+        var properties: Properties? = null
 
         init {
             properties = Properties()
-            val filePath = javaClass.getResource("/$PROPERTIES_FILE")?.getFile()
+            val filePath = javaClass.getResource("/$PROPERTIES_FILE")?.file
             Assert.assertNotNull(filePath)
             properties!!.load(FileInputStream(filePath!!))
         }
 
-        public enum class Result {
+        enum class Result {
             TRACE_FINISHED,
             POSITION_REACHED,
             BREAKPOINT_REACHED,
@@ -50,7 +50,7 @@ public abstract class DebuggerTest<T : ProcessDebugger> {
             BREAKPOINT_SET_AT
         }
 
-        public class BreakpointPosition(val module: String, val line: Int) {
+        class BreakpointPosition(val module: String, val line: Int) {
             override fun equals(other: Any?): Boolean {
                 if (other == null || other !is BreakpointPosition) {
                     return false
@@ -61,18 +61,18 @@ public abstract class DebuggerTest<T : ProcessDebugger> {
             override fun hashCode(): Int = module.hashCode() * 31 + line
         }
 
-        public class BreakpointEntry(var breakpointNumber: Int?, val breakpoint: HaskellLineBreakpointDescription)
+        class BreakpointEntry(var breakpointNumber: Int?, val breakpoint: HaskellLineBreakpointDescription)
 
     }
 
-    public inner class TestRespondent : DebugRespondent {
-        public val moduleName: String = "Main"
-        public var result: Result? = null
-        public var context: HsSuspendContext? = null
-        public var breakpoint: HaskellLineBreakpointDescription? = null
-        public val breakpoints: MutableMap<BreakpointPosition, BreakpointEntry> = hashMapOf()
-        public var currentFrame: HsHistoryFrame? = null
-        public var history: HistoryResult? = null
+    inner class TestRespondent : DebugRespondent {
+        val moduleName: String = "Main"
+        var result: Result? = null
+        var context: HsSuspendContext? = null
+        var breakpoint: HaskellLineBreakpointDescription? = null
+        val breakpoints: MutableMap<BreakpointPosition, BreakpointEntry> = hashMapOf()
+        var currentFrame: HsHistoryFrame? = null
+        var history: HistoryResult? = null
 
         override fun traceFinished() = withSignal {
             result = Result.TRACE_FINISHED
@@ -100,13 +100,13 @@ public abstract class DebuggerTest<T : ProcessDebugger> {
 
         override fun getBreakpointAt(module: String, line: Int): HaskellLineBreakpointDescription? {
             assert(module.equals(moduleName))
-            return breakpoints.get(BreakpointPosition(module, line))?.breakpoint
+            return breakpoints[BreakpointPosition(module, line)]?.breakpoint
         }
 
         override fun setBreakpointNumberAt(breakpointNumber: Int, module: String, line: Int) = withSignal {
             assert(module.equals(moduleName))
             result = Result.BREAKPOINT_SET_AT
-            val entry = breakpoints.get(BreakpointPosition(module, line))
+            val entry = breakpoints[BreakpointPosition(module, line)]
             if (entry != null) {
                 entry.breakpointNumber = breakpointNumber
             }
@@ -124,7 +124,7 @@ public abstract class DebuggerTest<T : ProcessDebugger> {
 
         override fun getModuleByFile(filename: String): String = moduleName
 
-        public fun addBreakpointToMap(module: String, line: Int) {
+        fun addBreakpointToMap(module: String, line: Int) {
             assert(module.equals(moduleName))
             val position = BreakpointPosition(module, line)
             val breakpoint = HaskellLineBreakpointDescription(module, line, null)
@@ -162,9 +162,9 @@ public abstract class DebuggerTest<T : ProcessDebugger> {
 
     private fun assertResult(expected: Result) = Assert.assertEquals(expected, respondent?.result)
 
-    @Before public fun setupDebugger() {
-        val url = this.javaClass.getResource("/${TEST_MODULE_FILE}")
-        val file = url?.getFile()
+    @Before fun setupDebugger() {
+        val url = this.javaClass.getResource("/$TEST_MODULE_FILE")
+        val file = url?.file
         Assert.assertNotNull(file)
         val testFile = File(file!!)
         Assert.assertTrue(testFile.exists())
@@ -177,22 +177,22 @@ public abstract class DebuggerTest<T : ProcessDebugger> {
         debugger?.prepareDebugger()
     }
 
-    @After public fun stopDebugger() {
+    @After fun stopDebugger() {
         debugger?.close()
         stopDebuggerServices()
     }
 
-    @Test public fun mainTraceTest() {
+    @Test fun mainTraceTest() {
         withAwait { debugger!!.trace(null) }
         assertResult(Result.TRACE_FINISHED)
     }
 
-    @Test public fun customTraceTest() {
+    @Test fun customTraceTest() {
         withAwait { debugger!!.trace("print $ qsort [5, 1, 2]") }
         assertResult(Result.TRACE_FINISHED)
     }
 
-    @Test public fun setBreakpointTest() {
+    @Test fun setBreakpointTest() {
         withAwait {
             respondent!!.addBreakpointToMap("Main", QSORT_LINE)
             debugger!!.setBreakpoint("Main", QSORT_LINE)
@@ -200,7 +200,7 @@ public abstract class DebuggerTest<T : ProcessDebugger> {
         assertResult(Result.BREAKPOINT_SET_AT)
     }
 
-    @Test public fun stoppedAtBreakpointTest() {
+    @Test fun stoppedAtBreakpointTest() {
         withAwait {
             respondent!!.addBreakpointToMap("Main", MAIN_LINE)
             debugger!!.setBreakpoint("Main", MAIN_LINE)
@@ -208,14 +208,14 @@ public abstract class DebuggerTest<T : ProcessDebugger> {
         withAwait { debugger!!.trace(null) }
         assertResult(Result.BREAKPOINT_REACHED)
         val filePosition = respondent!!.context?.threadInfo?.topFrameInfo?.filePosition
-        Assert.assertEquals(respondent!!.breakpoints.get(BreakpointPosition("Main", MAIN_LINE))!!.breakpoint, respondent!!.breakpoint)
+        Assert.assertEquals(respondent!!.breakpoints[BreakpointPosition("Main", MAIN_LINE)]!!.breakpoint, respondent!!.breakpoint)
         Assert.assertEquals(MAIN_LINE, filePosition?.rawStartLine)
         Assert.assertEquals(MAIN_LINE, filePosition?.rawEndLine)
         Assert.assertEquals(8, filePosition?.rawStartSymbol)
         Assert.assertEquals(57, filePosition?.rawEndSymbol)
     }
 
-    @Test public fun resumeTest() {
+    @Test fun resumeTest() {
         withAwait {
             respondent!!.addBreakpointToMap("Main", MAIN_LINE)
             debugger!!.setBreakpoint("Main", MAIN_LINE)
@@ -225,19 +225,19 @@ public abstract class DebuggerTest<T : ProcessDebugger> {
         assertResult(Result.TRACE_FINISHED)
     }
 
-    @Test public fun removeBreakpointTest() {
+    @Test fun removeBreakpointTest() {
         withAwait {
             respondent!!.addBreakpointToMap("Main", QSORT_LINE)
             debugger!!.setBreakpoint("Main", QSORT_LINE)
         }
         withAwait { debugger!!.trace(null) }
-        withAwait { debugger!!.removeBreakpoint("Main", respondent!!.breakpoints.get(BreakpointPosition("Main", 6))!!.breakpointNumber!!) }
+        withAwait { debugger!!.removeBreakpoint("Main", respondent!!.breakpoints[BreakpointPosition("Main", 6)]!!.breakpointNumber!!) }
         assertResult(Result.BREAKPOINT_REMOVED)
         withAwait { debugger!!.resume() }
         assertResult(Result.TRACE_FINISHED)
     }
 
-    @Test public fun stepTest() {
+    @Test fun stepTest() {
         withAwait {
             respondent!!.addBreakpointToMap("Main", MAIN_LINE)
             debugger!!.setBreakpoint("Main", MAIN_LINE)
@@ -252,7 +252,7 @@ public abstract class DebuggerTest<T : ProcessDebugger> {
         Assert.assertEquals(57, filePosition?.rawEndSymbol)
     }
 
-    @Test public fun stepLocalTest() {
+    @Test fun stepLocalTest() {
         withAwait {
             respondent!!.addBreakpointToMap("Main", 13)
             debugger!!.setBreakpoint("Main", 13)
@@ -264,7 +264,7 @@ public abstract class DebuggerTest<T : ProcessDebugger> {
         assertResult(Result.TRACE_FINISHED)
     }
 
-    @Test public fun runToPositionTest() {
+    @Test fun runToPositionTest() {
         withAwait { debugger!!.runToPosition("Main", MAIN_LINE) }
         assertResult(Result.POSITION_REACHED)
         val filePosition = respondent!!.context?.threadInfo?.topFrameInfo?.filePosition
@@ -274,45 +274,45 @@ public abstract class DebuggerTest<T : ProcessDebugger> {
         Assert.assertEquals(57, filePosition?.rawEndSymbol)
     }
 
-    @Test public fun uncaughtExceptionBreakpointTest1() {
+    @Test fun uncaughtExceptionBreakpointTest1() {
         debugger!!.setExceptionBreakpoint(true)
         withAwait { debugger!!.trace("uncaughtMain") }
         assertResult(Result.EXCEPTION_REACHED)
     }
 
-    @Test public fun uncaughtExceptionBreakpointTest2() {
+    @Test fun uncaughtExceptionBreakpointTest2() {
         debugger!!.setExceptionBreakpoint(true)
         withAwait { debugger!!.trace("caughtMain") }
         assertResult(Result.TRACE_FINISHED)
     }
 
-    @Test public fun anyExceptionBreakpointTest1() {
+    @Test fun anyExceptionBreakpointTest1() {
         debugger!!.setExceptionBreakpoint(false)
         withAwait { debugger!!.trace("uncaughtMain") }
         assertResult(Result.EXCEPTION_REACHED)
     }
 
-    @Test public fun anyExceptionBreakpointTest2() {
+    @Test fun anyExceptionBreakpointTest2() {
         debugger!!.setExceptionBreakpoint(false)
         withAwait { debugger!!.trace("caughtMain") }
         assertResult(Result.EXCEPTION_REACHED)
     }
 
-    @Test public fun removeExceptionBreakpointTest1() {
+    @Test fun removeExceptionBreakpointTest1() {
         debugger!!.setExceptionBreakpoint(false)
         debugger!!.removeExceptionBreakpoint()
         withAwait { debugger!!.trace("uncaughtMain") }
         assertResult(Result.TRACE_FINISHED)
     }
 
-    @Test public fun removeExceptionBreakpointTest2() {
+    @Test fun removeExceptionBreakpointTest2() {
         debugger!!.setExceptionBreakpoint(true)
         debugger!!.removeExceptionBreakpoint()
         withAwait { debugger!!.trace("uncaughtMain") }
         assertResult(Result.TRACE_FINISHED)
     }
 
-    @Test public fun evaluateTest1() {
+    @Test fun evaluateTest1() {
         var evalResult: XValue? = null
         withAwait {
             debugger!!.evaluateExpression("expression", object : XDebuggerEvaluator.XEvaluationCallback {
@@ -327,7 +327,7 @@ public abstract class DebuggerTest<T : ProcessDebugger> {
         }
     }
 
-    @Test public fun evaluateTest2() {
+    @Test fun evaluateTest2() {
         var evalResult: XValue? = null
         withAwait {
             debugger!!.evaluateExpression("(1 + 2 * 3) :: Int", object : XDebuggerEvaluator.XEvaluationCallback {
@@ -342,7 +342,7 @@ public abstract class DebuggerTest<T : ProcessDebugger> {
         }
     }
 
-    @Test public fun forceTest() {
+    @Test fun forceTest() {
         var forceResult: LocalBinding? = null
         withAwait { debugger!!.setBreakpoint("Main", QSORT_LINE) }
         withAwait { debugger!!.trace(null) }

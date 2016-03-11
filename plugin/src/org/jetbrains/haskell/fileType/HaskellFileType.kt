@@ -2,12 +2,11 @@ package org.jetbrains.haskell.fileType
 
 import com.intellij.openapi.fileTypes.LanguageFileType
 import com.intellij.openapi.vfs.VirtualFile
-import org.jetbrains.annotations.NonNls
 import org.jetbrains.haskell.HaskellLanguage
 import org.jetbrains.haskell.icons.HaskellIcons
-import javax.swing.*
+import javax.swing.Icon
 
-public class HaskellFileType() : LanguageFileType(HaskellLanguage.INSTANCE) {
+class HaskellFileType() : LanguageFileType(HaskellLanguage.INSTANCE) {
 
     private var myIcon: Icon = HaskellIcons.DEFAULT
 
@@ -27,8 +26,7 @@ public class HaskellFileType() : LanguageFileType(HaskellLanguage.INSTANCE) {
             "UTF-8"
 
     companion object {
-        @JvmField
-        public val INSTANCE: HaskellFileType = HaskellFileType()
-        public val DEFAULT_EXTENSION: String = "hs"
+        @JvmField val INSTANCE: HaskellFileType = HaskellFileType()
+        val DEFAULT_EXTENSION: String = "hs"
     }
 }

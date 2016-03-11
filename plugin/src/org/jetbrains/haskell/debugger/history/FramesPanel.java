@@ -2,8 +2,6 @@ package org.jetbrains.haskell.debugger.history;
 
 import com.intellij.ui.components.JBList;
 import javax.swing.*;
-import javax.swing.event.ListSelectionEvent;
-import javax.swing.event.ListSelectionListener;
 
 public class FramesPanel extends JBList {
   private DefaultListModel listModel = new DefaultListModel();
@@ -12,12 +10,7 @@ public class FramesPanel extends JBList {
     setModel(listModel);
     setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
     setValueIsAdjusting(true);
-    addListSelectionListener(new ListSelectionListener() {
-      @Override
-      public void valueChanged(ListSelectionEvent e) {
-        manager.indexSelected(getSelectedIndex());
-      }
-    });
+    addListSelectionListener(e -> manager.indexSelected(getSelectedIndex()));
   }
 
   @Override

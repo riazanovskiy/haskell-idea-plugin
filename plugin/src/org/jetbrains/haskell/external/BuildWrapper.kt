@@ -1,25 +1,19 @@
 package org.jetbrains.haskell.external
 
-import org.jetbrains.haskell.util.OSUtil
-import java.io.File
-import org.jetbrains.haskell.util.joinPath
-import org.jetbrains.haskell.util.ProcessRunner
-import org.json.simple.JSONValue
-import org.json.simple.JSONArray
-import org.jetbrains.haskell.config.HaskellSettings
-import java.io.IOException
-import com.intellij.openapi.vfs.VirtualFile
-import com.intellij.psi.PsiFile
-import com.intellij.openapi.module.ModuleUtilCore
-import com.intellij.psi.PsiElement
-import org.jetbrains.haskell.util.LineColPosition
-import org.json.simple.JSONObject
-import org.jetbrains.haskell.util.getRelativePath
-import org.jetbrains.cabal.CabalInterface
-import com.intellij.notification.Notifications.Bus
 import com.intellij.notification.Notification
-import com.intellij.notification.Notifications
 import com.intellij.notification.NotificationType
+import com.intellij.notification.Notifications
+import com.intellij.openapi.module.ModuleUtilCore
+import com.intellij.openapi.vfs.VirtualFile
+import com.intellij.psi.PsiElement
+import org.jetbrains.cabal.CabalInterface
+import org.jetbrains.haskell.util.LineColPosition
+import org.jetbrains.haskell.util.ProcessRunner
+import org.jetbrains.haskell.util.getRelativePath
+import org.json.simple.JSONArray
+import org.json.simple.JSONObject
+import org.json.simple.JSONValue
+import java.io.IOException
 
 /**
  * Created by atsky on 12/05/14.
@@ -28,18 +22,18 @@ class BuildWrapper(val moduleRoot: String,
                    val cabalFile : String) {
     companion object {
 
-        public fun init(element : PsiElement) : BuildWrapper {
+        fun init(element : PsiElement) : BuildWrapper {
             val moduleRoot = BuildWrapper.getModuleContentDir(element)!!
             val virtualFile = CabalInterface.findCabal(element)!!
 
-            return BuildWrapper(moduleRoot.getPath(), virtualFile.getPath())
+            return BuildWrapper(moduleRoot.path, virtualFile.path)
         }
 
         fun getProgramPath(): String {
             throw UnsupportedOperationException()
         }
 
-        public fun check() : Boolean {
+        fun check() : Boolean {
             try {
                 ProcessRunner(null).executeOrFail(getProgramPath(), "-V")
                 return true
@@ -51,13 +45,13 @@ class BuildWrapper(val moduleRoot: String,
 
         fun getModuleContentDir(file: PsiElement): VirtualFile? {
             val module = ModuleUtilCore.findModuleForPsiElement(file)
-            return module?.getModuleFile()?.getParent()
+            return module?.moduleFile?.parent
         }
     }
 
     fun thingatpoint(file : VirtualFile, pos : LineColPosition): JSONObject? {
 
-        val relativePath = getRelativePath(moduleRoot, file.getPath())
+        val relativePath = getRelativePath(moduleRoot, file.path)
 
         try {
             val out = ProcessRunner(moduleRoot).executeOrFail(
@@ -101,7 +95,7 @@ class BuildWrapper(val moduleRoot: String,
     }
 
     fun build1(file : VirtualFile) : JSONArray? {
-        val relativePath = getRelativePath(moduleRoot, file.getPath())
+        val relativePath = getRelativePath(moduleRoot, file.path)
 
         val out = ProcessRunner(moduleRoot).executeNoFail(
                 getProgramPath(), "build1", "-t", ".buildwrapper", "--cabalfile=" + cabalFile, "-f", relativePath)

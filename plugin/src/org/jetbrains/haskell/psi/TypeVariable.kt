@@ -1,20 +1,19 @@
 package org.jetbrains.haskell.psi
 
 import com.intellij.lang.ASTNode
-import com.intellij.extapi.psi.ASTWrapperPsiElement
-import com.intellij.psi.PsiReference
-import org.jetbrains.haskell.psi.reference.TypeReference
 import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiNamedElement
+import com.intellij.psi.PsiReference
+import org.jetbrains.haskell.psi.reference.TypeReference
 import org.jetbrains.haskell.psi.util.HaskellElementFactory
 
 /**
  * Created by atsky on 4/11/14.
  */
-public class TypeVariable(node: ASTNode) : HaskellType(node), PsiNamedElement {
+class TypeVariable(node: ASTNode) : HaskellType(node), PsiNamedElement {
 
     override fun getName(): String? {
-        return getText()
+        return text
     }
 
     override fun getLeftTypeVariable() : TypeVariable? {
@@ -22,13 +21,13 @@ public class TypeVariable(node: ASTNode) : HaskellType(node), PsiNamedElement {
     }
 
     override fun setName(name: String): PsiElement? {
-        val qcon = HaskellElementFactory.createExpressionFromText(getProject(), name)
-        getFirstChild().replace(qcon)
+        val qcon = HaskellElementFactory.createExpressionFromText(project, name)
+        firstChild.replace(qcon)
         return qcon
     }
 
     fun getNameText() : String? {
-        return getText()
+        return text
     }
 
     override fun getReference(): PsiReference? =
@@ -42,7 +41,7 @@ public class TypeVariable(node: ASTNode) : HaskellType(node), PsiNamedElement {
     fun isClass() : Boolean {
         var current : PsiElement? = this
         while (true) {
-            val parent = current!!.getParent()
+            val parent = current!!.parent
             if (parent is Context) {
                 return true
             }
@@ -59,7 +58,7 @@ public class TypeVariable(node: ASTNode) : HaskellType(node), PsiNamedElement {
     fun isConstructor() : Boolean {
         var current : PsiElement? = this
         while (true) {
-            val parent = current!!.getParent()
+            val parent = current!!.parent
             if (parent is ConstructorDeclaration) {
                 return true
             }

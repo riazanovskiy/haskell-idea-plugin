@@ -38,7 +38,7 @@ class NonTerminalTree(val rule : String,
         for (r in children) {
             builder.append(r.toString() + ", ")
         }
-        return rule + "{" + builder + "}"
+        return "$rule{$builder}"
     }
 
     fun prettyPrint(level : Int): String {
@@ -54,7 +54,7 @@ class NonTerminalTree(val rule : String,
                 builder.append(r.toString())
             }
         }
-        return rule + "{" + builder + "}"
+        return "$rule{$builder}"
     }
 
     override fun size(): Int {

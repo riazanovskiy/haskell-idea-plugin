@@ -1,14 +1,8 @@
 package org.jetbrains.haskell.util
 
-import java.io.File
-import java.io.BufferedReader
-import java.io.Reader
-import java.io.FileReader
-import java.io.FileInputStream
-import java.io.FileOutputStream
-import java.io.InputStream
+import java.io.*
 
-public fun joinPath(first: String, vararg more: String): String {
+fun joinPath(first: String, vararg more: String): String {
     var result = first
     for (str in more) {
         result += File.separator + str
@@ -17,11 +11,11 @@ public fun joinPath(first: String, vararg more: String): String {
 }
 
 
-public fun deleteRecursive(path: File) {
+fun deleteRecursive(path: File) {
     val files = path.listFiles();
     if (files != null) {
         for (file in files) {
-            if (file.isDirectory()) {
+            if (file.isDirectory) {
                 deleteRecursive(file);
                 file.delete();
             } else {
@@ -32,7 +26,7 @@ public fun deleteRecursive(path: File) {
     path.delete();
 }
 
-public fun copyFile(iStream: InputStream, destination: File) {
+fun copyFile(iStream: InputStream, destination: File) {
     val oStream = FileOutputStream(destination);
     try {
         val buffer = ByteArray(1024 * 16);
@@ -50,9 +44,9 @@ public fun copyFile(iStream: InputStream, destination: File) {
     }
 }
 
-public fun getRelativePath(base: String, path: String): String {
-    val bpath = File(base).getCanonicalPath()
-    val fpath = File(path).getCanonicalPath()
+fun getRelativePath(base: String, path: String): String {
+    val bpath = File(base).canonicalPath
+    val fpath = File(path).canonicalPath
 
     if (fpath.startsWith(bpath)) {
         return fpath.substring(bpath.length + 1)

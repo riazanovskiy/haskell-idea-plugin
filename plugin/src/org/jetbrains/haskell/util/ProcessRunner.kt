@@ -1,16 +1,15 @@
 package org.jetbrains.haskell.util
 
 import java.io.*
-import java.util.ArrayList
 
-public class ProcessRunner(workingDirectory: String? = null) {
+class ProcessRunner(workingDirectory: String? = null) {
     private val myWorkingDirectory: String? = workingDirectory
 
-    public fun executeNoFail(vararg cmd: String): String {
+    fun executeNoFail(vararg cmd: String): String {
         return executeNoFail(cmd.toList(), null)
     }
 
-    public fun executeNoFail(cmd: List<String>, input: String?): String {
+    fun executeNoFail(cmd: List<String>, input: String?): String {
         try {
             return executeOrFail(cmd, input)
         } catch (e: IOException) {
@@ -18,20 +17,20 @@ public class ProcessRunner(workingDirectory: String? = null) {
         }
     }
 
-    public fun executeOrFail(vararg cmd: String): String {
+    fun executeOrFail(vararg cmd: String): String {
         return executeOrFail(cmd.toList(), null)
     }
 
 
-    public fun executeOrFail(cmd: List<String>, input: String?): String {
+    fun executeOrFail(cmd: List<String>, input: String?): String {
         val process = getProcess(cmd.toList())
         if (input != null) {
-            val streamWriter = OutputStreamWriter(process.getOutputStream()!!)
+            val streamWriter = OutputStreamWriter(process.outputStream!!)
             streamWriter.write(input)
             streamWriter.close()
         }
 
-        var myInput: InputStream = process.getInputStream()!!
+        var myInput: InputStream = process.inputStream!!
         val data = readData(myInput)
 
         process.waitFor()
@@ -39,18 +38,18 @@ public class ProcessRunner(workingDirectory: String? = null) {
         return data
     }
 
-    public fun getProcess(cmd: List<String>, path: String? = null): Process {
+    fun getProcess(cmd: List<String>, path: String? = null): Process {
         val processBuilder: ProcessBuilder = ProcessBuilder(cmd)
 
         if (path != null) {
             val environment = processBuilder.environment()!!
-            environment.put("PATH", environment.get("PATH") + ":" + path)
+            environment.put("PATH", environment["PATH"] + ":" + path)
         }
 
         if (OSUtil.isMac) {
             // It's hack to make homebrew based HaskellPlatform work
             val environment = processBuilder.environment()!!
-            environment.put("PATH", environment.get("PATH") + ":/usr/local/bin")
+            environment.put("PATH", environment["PATH"] + ":/usr/local/bin")
         }
 
         if (myWorkingDirectory != null) {
@@ -62,13 +61,10 @@ public class ProcessRunner(workingDirectory: String? = null) {
     }
 
 
-    public fun readData(input: InputStream, callback: Callback): Unit {
+    fun readData(input: InputStream, callback: Callback): Unit {
         val reader = BufferedReader(InputStreamReader(input))
         while (true) {
-            var line = reader.readLine()
-            if (line == null) {
-                return
-            }
+            var line: String? = reader.readLine() ?: return
 
             callback.call(line)
         }
@@ -77,7 +73,7 @@ public class ProcessRunner(workingDirectory: String? = null) {
     private fun readData(input: InputStream): String {
         val builder = StringBuilder()
         readData(input, object : Callback {
-            public override fun call(command: String?): Boolean {
+            override fun call(command: String?): Boolean {
                 builder.append(command).append("\n")
                 return true
             }
@@ -85,8 +81,8 @@ public class ProcessRunner(workingDirectory: String? = null) {
         return builder.toString()
     }
 
-    public interface Callback {
-        public open fun call(command: String?): Boolean
+    interface Callback {
+        open fun call(command: String?): Boolean
 
 
     }

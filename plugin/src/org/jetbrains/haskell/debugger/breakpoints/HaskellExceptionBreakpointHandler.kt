@@ -1,15 +1,14 @@
 package org.jetbrains.haskell.debugger.breakpoints
 
-import com.intellij.xdebugger.breakpoints.XBreakpointHandler
-import com.intellij.xdebugger.breakpoints.XBreakpointProperties
 import com.intellij.xdebugger.breakpoints.XBreakpoint
+import com.intellij.xdebugger.breakpoints.XBreakpointHandler
 import org.jetbrains.haskell.debugger.HaskellDebugProcess
 
 /**
  * Created by vlad on 8/6/14.
  */
 
-public class HaskellExceptionBreakpointHandler(val debugProcess: HaskellDebugProcess) :
+class HaskellExceptionBreakpointHandler(val debugProcess: HaskellDebugProcess) :
         XBreakpointHandler<XBreakpoint<HaskellExceptionBreakpointProperties>>(HaskellExceptionBreakpointType::class.java) {
 
     override fun registerBreakpoint(breakpoint: XBreakpoint<HaskellExceptionBreakpointProperties>) {

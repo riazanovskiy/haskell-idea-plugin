@@ -1,15 +1,14 @@
 package org.jetbrains.haskell.debugger.protocol
 
-import java.util.Deque
-import org.jetbrains.haskell.debugger.parser.ParseResult
-import org.json.simple.JSONObject
 import org.jetbrains.haskell.debugger.procdebuggers.utils.DebugRespondent
+import org.json.simple.JSONObject
+import java.util.*
 
 /**
  * @author Habibullin Marat
  */
 
-public class RemoveBreakpointCommand(val module: String?, val breakpointNumber: Int, callback: CommandCallback<Nothing?>?)
+class RemoveBreakpointCommand(val module: String?, val breakpointNumber: Int, callback: CommandCallback<Nothing?>?)
 : RealTimeCommand<Nothing?>(callback) {
 
     override fun getText(): String = ":delete ${module ?: ""} $breakpointNumber\n"
@@ -18,7 +17,7 @@ public class RemoveBreakpointCommand(val module: String?, val breakpointNumber: 
 
     override fun parseJSONOutput(output: JSONObject): Nothing? = null
 
-    public class StandardRemoveBreakpointCallback(val respondent: DebugRespondent) : CommandCallback<Nothing?>() {
+    class StandardRemoveBreakpointCallback(val respondent: DebugRespondent) : CommandCallback<Nothing?>() {
         override fun execAfterParsing(result: Nothing?) {
             respondent.breakpointRemoved()
         }

@@ -38,6 +38,6 @@ public class CabalPackagesContainer implements PersistentStateComponent<CabalPac
   }
 
   public static class PackageConfig {
-      public List<String> myPackages = new ArrayList<String>();
+      public List<String> myPackages = new ArrayList<>();
     }
 }

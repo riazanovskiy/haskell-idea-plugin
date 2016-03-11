@@ -4,20 +4,19 @@ import com.intellij.lang.BracePair
 import com.intellij.lang.PairedBraceMatcher
 import com.intellij.psi.PsiFile
 import com.intellij.psi.tree.IElementType
-import org.jetbrains.haskell.parser.lexer.*
 import org.jetbrains.grammar.HaskellLexerTokens
 
-public class HaskellBraceMatcher() : PairedBraceMatcher {
+class HaskellBraceMatcher() : PairedBraceMatcher {
 
-    public override fun getPairs(): Array<BracePair> {
+    override fun getPairs(): Array<BracePair> {
         return PAIRS
     }
 
-    public override fun isPairedBracesAllowedBeforeType(lbraceType: IElementType, contextType: IElementType?): Boolean {
+    override fun isPairedBracesAllowedBeforeType(lbraceType: IElementType, contextType: IElementType?): Boolean {
         return true
     }
 
-    public override fun getCodeConstructStart(file: PsiFile?, openingBraceOffset: Int): Int {
+    override fun getCodeConstructStart(file: PsiFile?, openingBraceOffset: Int): Int {
         return openingBraceOffset
     }
 

@@ -1,26 +1,12 @@
 package org.jetbrains.grammar
 
-import com.intellij.psi.tree.IElementType
+import com.intellij.lang.ASTNode
 import com.intellij.lang.PsiBuilder
 import com.intellij.lang.PsiBuilder.Marker
-import org.jetbrains.grammar.dumb.Rule
-import com.intellij.lang.ASTNode
-import org.jetbrains.haskell.parser.rules.BaseParser
-import java.util.ArrayList
-import org.jetbrains.grammar.dumb.NonTerminalTree
-
-import org.jetbrains.grammar.dumb.TerminalTree
-
-import org.jetbrains.grammar.dumb.Variant
-import org.jetbrains.grammar.dumb.Term
-import org.jetbrains.grammar.dumb.LazyLLParser
-import org.jetbrains.haskell.parser.getCachedTokens
-import org.jetbrains.haskell.parser.token.NEW_LINE
-import org.jetbrains.grammar.dumb.Terminal
+import com.intellij.psi.tree.IElementType
+import org.jetbrains.grammar.dumb.*
 import org.jetbrains.haskell.parser.HaskellTokenType
-import org.jetbrains.grammar.dumb.NonTerminal
-import org.jetbrains.grammar.dumb.TerminalVariant
-import org.jetbrains.grammar.dumb.NonTerminalVariant
+import org.jetbrains.haskell.parser.getCachedTokens
 
 
 abstract class BaseHaskellParser(val builder: PsiBuilder?) {
@@ -58,7 +44,7 @@ abstract class BaseHaskellParser(val builder: PsiBuilder?) {
             builder.advanceLexer()
         }
         rootMarker.done(root)
-        return builder.getTreeBuilt()
+        return builder.treeBuilt
     }
 
     fun parserWithTree(tree: NonTerminalTree) {
@@ -73,7 +59,7 @@ abstract class BaseHaskellParser(val builder: PsiBuilder?) {
                 is TerminalTree -> {
                     if (child.haskellToken != HaskellLexerTokens.VOCURLY &&
                         child.haskellToken != HaskellLexerTokens.VCCURLY) {
-                        if (child.haskellToken == builderNotNull.getTokenType()) {
+                        if (child.haskellToken == builderNotNull.tokenType) {
                             builderNotNull.advanceLexer()
                         } else if (child.haskellToken != HaskellLexerTokens.SEMI) {
                             throw RuntimeException()

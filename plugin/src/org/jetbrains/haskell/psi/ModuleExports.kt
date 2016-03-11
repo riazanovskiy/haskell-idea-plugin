@@ -1,12 +1,11 @@
 package org.jetbrains.haskell.psi
 
-import com.intellij.lang.ASTNode
 import com.intellij.extapi.psi.ASTWrapperPsiElement
-import com.intellij.psi.util.PsiTreeUtil
+import com.intellij.lang.ASTNode
 
 /**
  * Created by atsky on 4/11/14.
  */
-public class ModuleExports(node: ASTNode) : ASTWrapperPsiElement(node) {
+class ModuleExports(node: ASTNode) : ASTWrapperPsiElement(node) {
 
 }

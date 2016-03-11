@@ -4,7 +4,6 @@ import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
 import java.io.IOException;
-import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Arrays;
 
@@ -21,7 +20,7 @@ public class CabalJspInterface{
 
     private Process runCommand(String ... command) throws IOException {
         final String path = myCabalPath != null ? myCabalPath : "cabal";
-        ArrayList<String> arguments = new ArrayList<String>();
+        ArrayList<String> arguments = new ArrayList<>();
         arguments.add(path);
         arguments.addAll(Arrays.asList(command));
         return new ProcessWrapper(myCabalFile.getParentFile().getCanonicalPath()).

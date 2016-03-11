@@ -1,13 +1,11 @@
 package org.jetbrains.grammar.dumb
 
 import com.intellij.psi.tree.IElementType
-import org.jetbrains.haskell.parser.HaskellTokenType
-import java.util.ArrayList
 import org.jetbrains.grammar.HaskellLexerTokens
-import java.util.HashMap
 import org.jetbrains.haskell.parser.CachedTokens
-import org.jetbrains.haskell.parser.newLexerState
 import org.jetbrains.haskell.parser.LexerState
+import org.jetbrains.haskell.parser.newLexerState
+import java.util.*
 
 class ParserResult(val children: List<ResultTree>,
                    val state: LexerState,
@@ -39,7 +37,7 @@ class LazyLLParser(val grammar: Map<String, Rule>, val cached: CachedTokens) {
     var lastCurlyState: RecoveryCallback? = null;
     var recoveryState: ParserState? = null;
 
-    public var writeLog: Boolean = false;
+    var writeLog: Boolean = false;
 
     fun parse(): NonTerminalTree? {
         val rule = grammar["module"]!!

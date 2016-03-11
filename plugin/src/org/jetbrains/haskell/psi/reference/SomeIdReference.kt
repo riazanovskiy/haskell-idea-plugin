@@ -1,26 +1,24 @@
 package org.jetbrains.haskell.psi.reference
 
-import org.jetbrains.haskell.psi.SomeId
-import com.intellij.psi.PsiReferenceBase
-import org.jetbrains.haskell.psi.ModuleName
 import com.intellij.openapi.util.TextRange
 import com.intellij.psi.PsiElement
+import com.intellij.psi.PsiReferenceBase
 import org.jetbrains.haskell.psi.Module
-import org.jetbrains.haskell.fileType.HaskellFile
+import org.jetbrains.haskell.psi.SomeId
 import org.jetbrains.haskell.scope.ModuleScope
-import java.util.ArrayList
+import java.util.*
 
 /**
  * Created by atsky on 4/11/14.
  */
 class SomeIdReference(val someId : SomeId) : PsiReferenceBase<SomeId>(
         someId,
-        TextRange(0, someId.getTextRange()!!.getLength())) {
+        TextRange(0, someId.textRange!!.length)) {
 
     override fun resolve(): PsiElement? {
         val module = Module.findModule(someId)
         if (module != null) {
-            val text = someId.getText()!!
+            val text = someId.text!!
             if (Character.isUpperCase(text[0])) {
                 //for (function in ModuleScope(module).getVisibleTypes()) {
                 //    if (function.getName() == text) {

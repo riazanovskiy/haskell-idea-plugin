@@ -1,23 +1,21 @@
 package org.jetbrains.haskell.actions
 
+import com.intellij.codeInsight.hint.HintManager
 import com.intellij.openapi.actionSystem.AnAction
 import com.intellij.openapi.actionSystem.AnActionEvent
-import com.intellij.openapi.actionSystem.PlatformDataKeys
 import com.intellij.openapi.actionSystem.CommonDataKeys
-import com.intellij.codeInsight.hint.HintManager
-import org.jetbrains.haskell.util.getRelativePath
-import org.jetbrains.haskell.util.LineColPosition
-import com.intellij.psi.PsiElement
-import org.jetbrains.haskell.external.GhcModi
-import java.util.regex.Pattern
 import com.intellij.openapi.application.ApplicationManager
-import com.intellij.openapi.fileEditor.FileDocumentManager
 import com.intellij.openapi.application.ModalityState
+import com.intellij.openapi.fileEditor.FileDocumentManager
+import org.jetbrains.haskell.external.GhcModi
+import org.jetbrains.haskell.util.LineColPosition
+import org.jetbrains.haskell.util.getRelativePath
+import java.util.regex.Pattern
 
 /**
  * Created by atsky on 5/30/14.
  */
-public class ShowTypeAction : AnAction() {
+class ShowTypeAction : AnAction() {
 
     data class TypeInfo(
         val startLine: Int,
@@ -51,39 +49,32 @@ public class ShowTypeAction : AnAction() {
             return
         }
 
-        val offset = editor.getCaretModel().getOffset();
-        val selectionStartOffset = editor.getSelectionModel().getSelectionStart()
-        val selectionEndOffset = editor.getSelectionModel().getSelectionEnd()
+        val offset = editor.caretModel.offset;
+        val selectionStartOffset = editor.selectionModel.selectionStart
+        val selectionEndOffset = editor.selectionModel.selectionEnd
         val range = if (selectionStartOffset != selectionEndOffset) {
             Pair(selectionStartOffset, selectionEndOffset)
         } else {
             val element = psiFile.findElementAt(offset)
 
-            val textRange = element?.getTextRange()
-            if (textRange == null) {
-                return
-            }
-            Pair(textRange.getStartOffset(), textRange.getEndOffset())
+            val textRange = element?.textRange ?: return
+            Pair(textRange.startOffset, textRange.endOffset)
         }
 
-        ApplicationManager.getApplication()!!.invokeAndWait(object : Runnable {
-            override fun run() {
-                FileDocumentManager.getInstance().saveAllDocuments()
-            }
-        }, ModalityState.any())
+        ApplicationManager.getApplication()!!.invokeAndWait({ FileDocumentManager.getInstance().saveAllDocuments() }, ModalityState.any())
 
         val start = LineColPosition.fromOffset(psiFile, range.first)!!
         val end = LineColPosition.fromOffset(psiFile, range.second)!!
 
         val lineColPosition = LineColPosition.fromOffset(psiFile, range.first)!!
 
-        val ghcModi = psiFile.getProject().getComponent(GhcModi::class.java)!!
-        val basePath = psiFile.getProject().getBasePath()!!
-        val relativePath = getRelativePath(basePath, psiFile.getVirtualFile()!!.getPath())
+        val ghcModi = psiFile.project.getComponent(GhcModi::class.java)!!
+        val basePath = psiFile.project.basePath!!
+        val relativePath = getRelativePath(basePath, psiFile.virtualFile!!.path)
 
         val line = lineColPosition.myLine
         val column = lineColPosition.myColumn
-        val cmd = "type ${relativePath} ${line} ${column}"
+        val cmd = "type $relativePath $line $column"
 
         val list = ghcModi.runCommand(cmd)
 

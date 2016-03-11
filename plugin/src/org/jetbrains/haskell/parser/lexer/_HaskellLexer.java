@@ -2,7 +2,6 @@
 
 package org.jetbrains.haskell.parser.lexer;
 
-import java.util.*;
 import com.intellij.lexer.*;
 import com.intellij.psi.*;
 import org.jetbrains.haskell.parser.token.*;
@@ -1091,7 +1090,7 @@ class _HaskellLexer implements FlexLexer {
    * @param   in  the java.io.Reader to read input from.
    */
   _HaskellLexer(java.io.Reader in) {
-    this.zzReader = in;
+    zzReader = in;
   }
 
   /**

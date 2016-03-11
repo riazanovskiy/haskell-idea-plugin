@@ -1,26 +1,27 @@
 package org.jetbrains.cabal.completion
 
+import com.intellij.codeInsight.completion.CompletionContributor
+import com.intellij.codeInsight.completion.CompletionParameters
+import com.intellij.codeInsight.completion.CompletionResultSet
+import com.intellij.codeInsight.completion.CompletionType
 import com.intellij.codeInsight.lookup.LookupElementBuilder
-import com.intellij.patterns.PlatformPatterns
-import com.intellij.psi.PsiElement
-import com.intellij.psi.PsiFile
-import com.intellij.codeInsight.completion.*
-import com.intellij.codeInsight.lookup.*
-import org.jetbrains.cabal.parser.*
-import org.jetbrains.cabal.psi.*
-import org.jetbrains.cabal.CabalInterface
 import org.jetbrains.cabal.CabalFile
+import org.jetbrains.cabal.CabalInterface
+import org.jetbrains.cabal.parser.BOOL_VALS
+import org.jetbrains.cabal.parser.PKG_DESCR_FIELDS
+import org.jetbrains.cabal.parser.SECTIONS
+import org.jetbrains.cabal.parser.TOP_SECTION_NAMES
+import org.jetbrains.cabal.psi.*
 import java.util.*
 
-public open class CabalCompletionContributor() : CompletionContributor() {
+open class CabalCompletionContributor() : CompletionContributor() {
 
-    public override fun fillCompletionVariants(parameters: CompletionParameters, result: CompletionResultSet): Unit {
-        if (parameters.getCompletionType() == CompletionType.BASIC) {
+    override fun fillCompletionVariants(parameters: CompletionParameters, result: CompletionResultSet): Unit {
+        if (parameters.completionType == CompletionType.BASIC) {
 
             val values = ArrayList<String>()
-            val current = parameters.getPosition()
-            val parent = current.getParent()
-            if (parent == null) { return }
+            val current = parameters.position
+            val parent = current.parent ?: return
             var caseSensitivity = true
 
             when (parent) {
@@ -52,7 +53,7 @@ public open class CabalCompletionContributor() : CompletionContributor() {
                 is Path -> {
                     val grandParent = parent.getParent()
                     if (grandParent is PathsField) {
-                        val originalRootDir = parameters.getOriginalFile().getVirtualFile()!!.getParent()!!
+                        val originalRootDir = parameters.originalFile.virtualFile!!.parent!!
                         values.addAll(grandParent.getNextAvailableFile(parent, originalRootDir))
                     }
                 }
@@ -61,17 +62,17 @@ public open class CabalCompletionContributor() : CompletionContributor() {
                     while ((parentField !is Field) && (parentField !is CabalFile) && (parentField != null)) {
                         // TODO Look like a bug in Kotlin.
                         val parentFieldVal = parentField
-                        parentField = parentFieldVal.getParent()
+                        parentField = parentFieldVal.parent
                     }
                     if (parentField is BuildDependsField) {
-                        val project = current.getProject()
+                        val project = current.project
                         values.addAll(CabalInterface(project).getInstalledPackagesList().map({ it.name }))
                     }
                 }
             }
 
             for (value in values) {
-                val lookupElemBuilder = LookupElementBuilder.create(value)!!.withCaseSensitivity(caseSensitivity)!!
+                val lookupElemBuilder = LookupElementBuilder.create(value).withCaseSensitivity(caseSensitivity)!!
                 result.addElement(lookupElemBuilder)
             }
         }

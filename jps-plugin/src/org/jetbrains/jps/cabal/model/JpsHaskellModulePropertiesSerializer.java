@@ -18,7 +18,7 @@ public class JpsHaskellModulePropertiesSerializer extends JpsModulePropertiesSer
 
     @Override
     public JpsSimpleElement<?> loadProperties(Element componentElement) {
-        return new JpsSimpleElementImpl<Object>(null);
+        return new JpsSimpleElementImpl<>(null);
     }
 
     @Override

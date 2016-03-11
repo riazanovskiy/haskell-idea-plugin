@@ -1,16 +1,15 @@
 package org.jetbrains.grammar.dumb
 
 import com.intellij.psi.tree.IElementType
-import java.util.HashSet
-import java.util.ArrayList
-import org.jetbrains.haskell.parser.HaskellTokenType
 import org.jetbrains.grammar.HaskellLexerTokens
+import org.jetbrains.haskell.parser.HaskellTokenType
+import java.util.*
 
 /**
  * Created by atsky on 14/11/14.
  */
 
-public abstract class Variant {
+abstract class Variant {
 
     fun add(tokenType : HaskellTokenType): NonTerminalVariant {
         return NonTerminalVariant(Terminal(tokenType), listOf(this))
@@ -31,7 +30,7 @@ public abstract class Variant {
 
 }
 
-public class TerminalVariant(val elementType: IElementType?) : Variant() {
+class TerminalVariant(val elementType: IElementType?) : Variant() {
 
 
     override fun isCanBeEmpty(): Boolean {
@@ -46,10 +45,10 @@ public class TerminalVariant(val elementType: IElementType?) : Variant() {
     }
 }
 
-public class NonTerminalVariant(val term: Term, val next: List<Variant>) : Variant() {
-    public var canBeEmpty: Boolean = false;
-    public var hasCurly: Boolean = false;
-    public var first: Set<IElementType>? = null;
+class NonTerminalVariant(val term: Term, val next: List<Variant>) : Variant() {
+    var canBeEmpty: Boolean = false;
+    var hasCurly: Boolean = false;
+    var first: Set<IElementType>? = null;
 
     override fun isCanBeEmpty(): Boolean {
         return canBeEmpty;

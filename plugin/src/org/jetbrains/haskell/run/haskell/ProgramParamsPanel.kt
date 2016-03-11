@@ -1,18 +1,17 @@
 package org.jetbrains.haskell.run.haskell
 
-import com.intellij.openapi.fileChooser.FileChooserDescriptor
-import com.intellij.openapi.module.Module
-import com.intellij.openapi.ui.LabeledComponent
-import com.intellij.openapi.ui.TextFieldWithBrowseButton
-import javax.swing.*
-import java.awt.GridBagLayout
-import java.awt.GridBagConstraints
-import org.jetbrains.haskell.util.*
-import com.intellij.ui.RawCommandLineEditor
 import com.intellij.execution.configuration.EnvironmentVariablesComponent
-import java.awt.Insets
+import com.intellij.openapi.module.Module
+import com.intellij.openapi.ui.TextFieldWithBrowseButton
+import com.intellij.ui.RawCommandLineEditor
 import org.jetbrains.haskell.run.ModuleComboBoxRenderer
+import org.jetbrains.haskell.util.JComboBoxWrapper
+import org.jetbrains.haskell.util.setConstraints
 import java.awt.BorderLayout
+import java.awt.GridBagConstraints
+import java.awt.GridBagLayout
+import java.awt.Insets
+import javax.swing.*
 
 class ProgramParamsPanel(modules: Array<Module>) : JPanel() {
     private var executableComponent: JTextField
@@ -22,23 +21,23 @@ class ProgramParamsPanel(modules: Array<Module>) : JPanel() {
     private var environmentVariables : EnvironmentVariablesComponent
 
 
-    public fun applyTo(s: CabalRunConfiguration): Unit {
-        s.setModule(moduleComboBox.getSelectedItem() as Module?)
-        s.setMyExecutableName(executableComponent.getText())
-        s.setProgramParameters(programParametersComponent.getText())
-        s.setWorkingDirectory(workingDirectoryComponent.getText())
-        s.setEnvs(environmentVariables.getEnvs())
+    fun applyTo(s: CabalRunConfiguration): Unit {
+        s.module = moduleComboBox.selectedItem as Module?
+        s.myExecutableName = executableComponent.text
+        s.programParameters = programParametersComponent.text
+        s.workingDirectory = workingDirectoryComponent.text
+        s.envs = environmentVariables.envs
     }
-    public fun reset(s: CabalRunConfiguration): Unit {
-        executableComponent.setText(s.getMyExecutableName())
-        programParametersComponent.setText(s.getProgramParameters())
-        workingDirectoryComponent.setText(s.getWorkingDirectory())
-        moduleComboBox.setSelectedItem(s.getModule())
-        environmentVariables.setEnvs(s.getEnvs())
+    fun reset(s: CabalRunConfiguration): Unit {
+        executableComponent.text = s.myExecutableName
+        programParametersComponent.text = s.programParameters
+        workingDirectoryComponent.text = s.workingDirectory
+        moduleComboBox.setSelectedItem(s.module)
+        environmentVariables.envs = s.envs
     }
 
     init {
-        this.setLayout(GridBagLayout())
+        this.layout = GridBagLayout()
         executableComponent = JTextField();
         moduleComboBox = JComboBoxWrapper(JComboBox(DefaultComboBoxModel(modules)))
         moduleComboBox.setRenderer(ModuleComboBoxRenderer())
@@ -46,7 +45,7 @@ class ProgramParamsPanel(modules: Array<Module>) : JPanel() {
         programParametersComponent = RawCommandLineEditor()
         workingDirectoryComponent = TextFieldWithBrowseButton()
         environmentVariables = EnvironmentVariablesComponent()
-        environmentVariables.setLabelLocation(BorderLayout.WEST)
+        environmentVariables.labelLocation = BorderLayout.WEST
 
 
         val base : () -> GridBagConstraints = {

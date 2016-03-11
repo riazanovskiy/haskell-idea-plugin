@@ -3,7 +3,7 @@ package org.jetbrains.haskell.parser.rules
 import com.intellij.lang.PsiBuilder
 import com.intellij.psi.tree.IElementType
 
-public open class BaseParser(public val root: IElementType, public val builder: PsiBuilder) {
+open class BaseParser(val root: IElementType, val builder: PsiBuilder) {
 
     fun done(marker: PsiBuilder.Marker, result: Boolean, elementType: IElementType): Boolean {
         if (result) {
@@ -15,7 +15,7 @@ public open class BaseParser(public val root: IElementType, public val builder: 
     }
 
     fun token(tokenType: IElementType): Boolean {
-        val elementType = builder.getTokenType()
+        val elementType = builder.tokenType
         if (elementType == tokenType) {
             builder.advanceLexer()
             return true;
@@ -24,8 +24,8 @@ public open class BaseParser(public val root: IElementType, public val builder: 
     }
 
     fun matchesIgnoreCase(tokenType: IElementType, text : String): Boolean {
-        val elementType = builder.getTokenType()
-        if (elementType == tokenType && builder.getTokenText()?.toLowerCase() == text.toLowerCase()) {
+        val elementType = builder.tokenType
+        if (elementType == tokenType && builder.tokenText?.toLowerCase() == text.toLowerCase()) {
             builder.advanceLexer()
             return true;
         }
@@ -35,8 +35,8 @@ public open class BaseParser(public val root: IElementType, public val builder: 
 
 
     fun matches(tokenType: IElementType, text : String): Boolean {
-        val elementType = builder.getTokenType()
-        if (elementType == tokenType && builder.getTokenText() == text) {
+        val elementType = builder.tokenType
+        if (elementType == tokenType && builder.tokenText == text) {
             builder.advanceLexer()
             return true;
         }

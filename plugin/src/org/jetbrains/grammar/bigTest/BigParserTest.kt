@@ -43,13 +43,9 @@ class BigParserTest {
         val tarArchiveInputStream = TarArchiveInputStream(gzIn)
 
         while (true) {
-            val entry = tarArchiveInputStream.getNextTarEntry();
+            val entry = tarArchiveInputStream.nextTarEntry ?: break;
 
-            if (entry == null) {
-                break
-            }
-
-            val name = entry.getName()
+            val name = entry.name
             if (name.endsWith(".hs")) {
                 val content = readToArray(tarArchiveInputStream)
                 if (!testFile(packageName, name, content)) {
@@ -84,7 +80,7 @@ class BigParserTest {
                 return false;
             }
         } catch (e: Exception) {
-            println(packageName + " - " + name + " - exception")
+            println("$packageName - $name - exception")
             if (failOnError) {
                 println(String(content))
             }
@@ -120,17 +116,17 @@ class BigParserTest {
 
         // Provide custom retry handler is necessary
 
-        method.getParams().setParameter(HttpMethodParams.RETRY_HANDLER,
+        method.params.setParameter(HttpMethodParams.RETRY_HANDLER,
                 DefaultHttpMethodRetryHandler(3, false));
 
         try {
             val statusCode = client.executeMethod(method);
 
             if (statusCode != HttpStatus.SC_OK) {
-                System.err.println("Method failed: " + method.getStatusLine());
+                System.err.println("Method failed: " + method.statusLine);
             }
             // Read the response body.
-            return method.getResponseBody()
+            return method.responseBody
         } catch (e: HttpException) {
             System.err.println("Fatal protocol violation: " + e.message);
             e.printStackTrace();
@@ -188,7 +184,7 @@ class BigParserTest {
     }
 
     private fun downloadPackage(file: File, name: String) {
-        val url = "http://hackage.haskell.org/package/${name}/${name}.tar.gz"
+        val url = "http://hackage.haskell.org/package/$name/$name.tar.gz"
         println("Dowloading: " + url)
         val byteArray = fetchUrl(url)
         val stream = FileOutputStream(file)

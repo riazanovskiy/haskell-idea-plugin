@@ -1,37 +1,27 @@
 package org.jetbrains.haskell.external
 
-import com.intellij.extapi.psi.ASTWrapperPsiElement
 import com.intellij.lang.annotation.AnnotationHolder
 import com.intellij.lang.annotation.ExternalAnnotator
 import com.intellij.lang.annotation.HighlightSeverity
 import com.intellij.openapi.application.ApplicationManager
-import com.intellij.openapi.editor.Document
+import com.intellij.openapi.application.ModalityState
 import com.intellij.openapi.fileEditor.FileDocumentManager
 import com.intellij.openapi.util.TextRange
-import com.intellij.openapi.vfs.VirtualFile
-import com.intellij.psi.PsiDocumentManager
-import com.intellij.psi.PsiElement
-import com.intellij.psi.PsiFile
-import org.jetbrains.annotations.Nullable
-import com.intellij.openapi.module.ModuleUtil
-import com.intellij.openapi.module.ModuleUtilCore
-import org.json.simple.JSONArray
-import java.io.File
-import org.jetbrains.haskell.util.copyFile
-import org.json.simple.JSONObject
-import org.jetbrains.haskell.util.LineColPosition
 import com.intellij.openapi.vfs.LocalFileSystem
-import java.util.HashSet
-import sun.nio.cs.StandardCharsets
-import java.io.ByteArrayInputStream
-import org.jetbrains.haskell.util.getRelativePath
-import com.intellij.openapi.application.ModalityState
+import com.intellij.openapi.vfs.VirtualFile
+import com.intellij.psi.PsiFile
 import com.intellij.xml.util.XmlStringUtil
-import java.util.regex.Pattern
-import java.util.ArrayList
 import org.jetbrains.haskell.config.HaskellSettings
+import org.jetbrains.haskell.util.LineColPosition
+import org.jetbrains.haskell.util.copyFile
+import org.jetbrains.haskell.util.getRelativePath
+import org.json.simple.JSONArray
+import java.io.ByteArrayInputStream
+import java.io.File
+import java.util.*
+import java.util.regex.Pattern
 
-public class HaskellExternalAnnotator() : ExternalAnnotator<PsiFile, List<ErrorMessage>>() {
+class HaskellExternalAnnotator() : ExternalAnnotator<PsiFile, List<ErrorMessage>>() {
 
     override fun collectInformation(file: PsiFile): PsiFile {
         return file
@@ -45,30 +35,30 @@ public class HaskellExternalAnnotator() : ExternalAnnotator<PsiFile, List<ErrorM
 
         val destinationFiles = HashSet(destination.list()!!.toList())
 
-        for (child in basePath.getChildren()!!) {
-            destinationFiles.remove(child.getName())
-            if (child.getName().equals(".idea")) {
+        for (child in basePath.children!!) {
+            destinationFiles.remove(child.name)
+            if (child.name.equals(".idea")) {
                 continue
             }
-            if (child.getName().equals("dist")) {
+            if (child.name.equals("dist")) {
                 continue
             }
-            if (child.getName().equals(".buildwrapper")) {
+            if (child.name.equals(".buildwrapper")) {
                 continue
             }
-            val destinationFile = File(destination, child.getName())
-            if (child.isDirectory()) {
+            val destinationFile = File(destination, child.name)
+            if (child.isDirectory) {
                 copyContent(child, destinationFile)
             } else {
-                val childTime = child.getModificationStamp()
+                val childTime = child.modificationStamp
                 val document = FileDocumentManager.getInstance().getCachedDocument(child)
                 if (document != null) {
-                    val stream = ByteArrayInputStream(document.getText().toByteArray(child.getCharset()));
+                    val stream = ByteArrayInputStream(document.text.toByteArray(child.charset));
                     copyFile(stream, destinationFile)
                 } else {
-                    val destinationTime = localFileSystem.findFileByIoFile(destinationFile)?.getModificationStamp()
+                    val destinationTime = localFileSystem.findFileByIoFile(destinationFile)?.modificationStamp
                     if (destinationTime == null || childTime > destinationTime) {
-                        copyFile(child.getInputStream()!!, destinationFile)
+                        copyFile(child.inputStream!!, destinationFile)
                     }
                 }
             }
@@ -83,16 +73,12 @@ public class HaskellExternalAnnotator() : ExternalAnnotator<PsiFile, List<ErrorM
     fun getResultFromGhcModi(psiFile: PsiFile,
                              baseDir: VirtualFile,
                              file: VirtualFile): List<ErrorMessage> {
-        ApplicationManager.getApplication()!!.invokeAndWait(object : Runnable {
-            override fun run() {
-                FileDocumentManager.getInstance().saveAllDocuments()
-            }
-        }, ModalityState.any())
+        ApplicationManager.getApplication()!!.invokeAndWait({ FileDocumentManager.getInstance().saveAllDocuments() }, ModalityState.any())
 
 
-        val ghcModi = psiFile.getProject().getComponent(GhcModi::class.java)!!
+        val ghcModi = psiFile.project.getComponent(GhcModi::class.java)!!
 
-        val relativePath = getRelativePath(baseDir.getPath(), file.getPath())
+        val relativePath = getRelativePath(baseDir.path, file.path)
 
         val result = ghcModi.runCommand("check $relativePath")
 
@@ -122,17 +108,13 @@ public class HaskellExternalAnnotator() : ExternalAnnotator<PsiFile, List<ErrorM
     fun getResultFromBuidWrapper(psiFile: PsiFile,
                                  moduleContent: VirtualFile,
                                  file: VirtualFile): List<ErrorMessage> {
-        ApplicationManager.getApplication()!!.invokeAndWait(object : Runnable {
-            override fun run() {
-                FileDocumentManager.getInstance().saveAllDocuments()
-            }
-        }, ModalityState.any())
+        ApplicationManager.getApplication()!!.invokeAndWait({ FileDocumentManager.getInstance().saveAllDocuments() }, ModalityState.any())
 
-        copyContent(moduleContent, File(moduleContent.getCanonicalPath()!!, ".buildwrapper"))
+        copyContent(moduleContent, File(moduleContent.canonicalPath!!, ".buildwrapper"))
 
         val out = BuildWrapper.init(psiFile).build1(file)
         if (out != null) {
-            val errors = out.get(1) as JSONArray
+            val errors = out[1] as JSONArray
 
             return errors.map {
                 ErrorMessage.fromJson(it!!)
@@ -142,25 +124,18 @@ public class HaskellExternalAnnotator() : ExternalAnnotator<PsiFile, List<ErrorM
     }
 
     fun getProjectBaseDir(psiFile: PsiFile): VirtualFile? {
-        return psiFile.getProject().getBaseDir()
+        return psiFile.project.baseDir
     }
 
     override fun doAnnotate(psiFile: PsiFile?): List<ErrorMessage> {
-        val file = psiFile!!.getVirtualFile()
-        if (file == null) {
-            return listOf()
-        }
+        val file = psiFile!!.virtualFile ?: return listOf()
 
-        val baseDir = getProjectBaseDir(psiFile)
+        val baseDir = getProjectBaseDir(psiFile) ?: return listOf()
 
-        if (baseDir == null) {
-            return listOf()
-        }
-
-        if (!(HaskellSettings.getInstance().getState().useGhcMod!!)) {
+        if (!(HaskellSettings.getInstance().state.useGhcMod!!)) {
             return listOf();
         }
-        if (!file.isInLocalFileSystem()) {
+        if (!file.isInLocalFileSystem) {
             return listOf()
         }
         return getResultFromGhcModi(psiFile, baseDir, file)
@@ -176,7 +151,7 @@ public class HaskellExternalAnnotator() : ExternalAnnotator<PsiFile, List<ErrorM
 
             val element = file.findElementAt(start)
             val textRange = if (element != null) {
-                element.getTextRange()
+                element.textRange
             } else {
                 TextRange(start, end)
             }

@@ -5,7 +5,7 @@ import com.intellij.openapi.fileTypes.FileTypeFactory
 import org.jetbrains.cabal.CabalFileType
 
 
-public class HaskellFileTypeFactory() : FileTypeFactory() {
+class HaskellFileTypeFactory() : FileTypeFactory() {
     override fun createFileTypes(consumer: FileTypeConsumer) {
         consumer.consume(HaskellFileType.INSTANCE, HaskellFileType.DEFAULT_EXTENSION)
         consumer.consume(CabalFileType.INSTANCE, CabalFileType.DEFAULT_EXTENSION)

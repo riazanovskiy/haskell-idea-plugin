@@ -1,21 +1,18 @@
 package org.jetbrains.haskell.debugger.protocol
 
-import java.util.Deque
-import org.jetbrains.haskell.debugger.HaskellDebugProcess
 import com.intellij.xdebugger.evaluation.XDebuggerEvaluator
-import com.intellij.xdebugger.frame.XNamedValue
 import org.jetbrains.haskell.debugger.frames.HsDebugValue
-import org.jetbrains.haskell.debugger.parser.LocalBinding
-import org.jetbrains.haskell.debugger.parser.ParseResult
 import org.jetbrains.haskell.debugger.parser.GHCiParser
+import org.jetbrains.haskell.debugger.parser.LocalBinding
 import org.jetbrains.haskell.debugger.parser.ShowOutput
 import org.json.simple.JSONObject
+import java.util.*
 
 /**
  * Created by vlad on 7/23/14.
  */
 
-public class ShowExpressionCommand(val expression: String, callback: CommandCallback<ShowOutput?>)
+class ShowExpressionCommand(val expression: String, callback: CommandCallback<ShowOutput?>)
 : RealTimeCommand<ShowOutput?>(callback) {
 
     /*
@@ -30,7 +27,7 @@ public class ShowExpressionCommand(val expression: String, callback: CommandCall
     }
 
     companion object {
-        public class StandardShowExpressionCallback(val expressionType: String?, val callback: XDebuggerEvaluator.XEvaluationCallback)
+        class StandardShowExpressionCallback(val expressionType: String?, val callback: XDebuggerEvaluator.XEvaluationCallback)
         : CommandCallback<ShowOutput?>() {
             override fun execAfterParsing(result: ShowOutput?) {
                 if (result == null) {

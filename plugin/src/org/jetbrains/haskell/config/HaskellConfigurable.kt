@@ -1,23 +1,21 @@
 package org.jetbrains.haskell.config
 
+import com.intellij.openapi.fileChooser.FileChooserDescriptorFactory
 import com.intellij.openapi.options.Configurable
-import org.jetbrains.haskell.icons.HaskellIcons
-import javax.swing.*
-import com.intellij.ui.DocumentAdapter
-import javax.swing.event.DocumentEvent
 import com.intellij.openapi.ui.TextFieldWithBrowseButton
+import com.intellij.ui.DocumentAdapter
+import com.intellij.ui.components.JBCheckBox
+import org.jetbrains.haskell.icons.HaskellIcons
+import org.jetbrains.haskell.util.gridBagConstraints
 import org.jetbrains.haskell.util.setConstraints
 import java.awt.GridBagConstraints
-import org.jetbrains.haskell.util.gridBagConstraints
-import java.awt.Insets
 import java.awt.GridBagLayout
-import com.intellij.openapi.fileChooser.FileChooserDescriptorFactory
-import com.intellij.openapi.fileTypes.FileType
-import com.intellij.ui.components.JBCheckBox
+import java.awt.Insets
+import javax.swing.*
 import javax.swing.event.ChangeListener
-import javax.swing.event.ChangeEvent
+import javax.swing.event.DocumentEvent
 
-public class HaskellConfigurable() : Configurable {
+class HaskellConfigurable() : Configurable {
     private var isModified = false
     private val cabalPathField = TextFieldWithBrowseButton()
     private val cabalDataPathField = TextFieldWithBrowseButton()
@@ -63,9 +61,9 @@ public class HaskellConfigurable() : Configurable {
 
         };
 
-        cabalPathField.getTextField()!!.getDocument()!!.addDocumentListener(listener)
-        cabalDataPathField.getTextField()!!.getDocument()!!.addDocumentListener(listener)
-        ghcMod.getTextField()!!.getDocument()!!.addDocumentListener(listener)
+        cabalPathField.textField!!.document!!.addDocumentListener(listener)
+        cabalDataPathField.textField!!.document!!.addDocumentListener(listener)
+        ghcMod.textField!!.document!!.addDocumentListener(listener)
 
         val base = gridBagConstraints {
             insets = Insets(2, 0, 2, 3)
@@ -98,11 +96,7 @@ public class HaskellConfigurable() : Configurable {
         addLabeledControl(2, "ghc-mod executable", ghcMod)
         addLabeledControl(3, "ghc-modi executable", ghcModi)
 
-        val defaultChangeListener = object : ChangeListener {
-            override fun stateChanged(p0: ChangeEvent) {
-                isModified = true;
-            }
-        }
+        val defaultChangeListener = ChangeListener { isModified = true; }
         useGhcMod.addChangeListener(defaultChangeListener)
         usePty.addChangeListener(defaultChangeListener)
 
@@ -129,18 +123,18 @@ public class HaskellConfigurable() : Configurable {
         return result
     }
 
-    public fun getIcon(): Icon {
+    fun getIcon(): Icon {
         return HaskellIcons.HASKELL
     }
 
     override fun apply() {
-        val state = HaskellSettings.getInstance().getState()
-        state.cabalPath = cabalPathField.getTextField()!!.getText()
-        state.cabalDataPath = cabalDataPathField.getTextField()!!.getText()
-        state.ghcModPath = ghcMod.getTextField()!!.getText()
-        state.ghcModiPath = ghcModi.getTextField()!!.getText()
-        state.useGhcMod = useGhcMod.isSelected()
-        state.usePtyProcess = usePty.isSelected()
+        val state = HaskellSettings.getInstance().state
+        state.cabalPath = cabalPathField.textField!!.text
+        state.cabalDataPath = cabalDataPathField.textField!!.text
+        state.ghcModPath = ghcMod.textField!!.text
+        state.ghcModiPath = ghcModi.textField!!.text
+        state.useGhcMod = useGhcMod.isSelected
+        state.usePtyProcess = usePty.isSelected
 
         isModified = false
     }
@@ -151,13 +145,13 @@ public class HaskellConfigurable() : Configurable {
     override fun getHelpTopic(): String? = null
 
     override fun reset() {
-        val state = HaskellSettings.getInstance().getState()
-        cabalPathField.getTextField()!!.setText(state.cabalPath ?: "")
-        cabalDataPathField.getTextField()!!.setText(state.cabalDataPath ?: "")
-        ghcMod.getTextField()!!.setText(state.ghcModPath ?: "")
-        ghcModi.getTextField()!!.setText(state.ghcModiPath ?: "")
-        useGhcMod.setSelected(state.useGhcMod!!)
-        usePty.setSelected(state.usePtyProcess!!)
+        val state = HaskellSettings.getInstance().state
+        cabalPathField.textField!!.text = state.cabalPath ?: ""
+        cabalDataPathField.textField!!.text = state.cabalDataPath ?: ""
+        ghcMod.textField!!.text = state.ghcModPath ?: ""
+        ghcModi.textField!!.text = state.ghcModiPath ?: ""
+        useGhcMod.isSelected = state.useGhcMod!!
+        usePty.isSelected = state.usePtyProcess!!
 
         isModified = false
     }

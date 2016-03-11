@@ -18,8 +18,6 @@ package org.jetbrains.jps.cabal.model;
 
 import org.jetbrains.annotations.Nullable;
 
-import java.io.File;
-
 public class JpsHaskellSdkProperties {
     @Nullable
     private final String ghcPath;

@@ -1,15 +1,6 @@
 package org.jetbrains.grammar.analysis
 
 import org.jetbrains.grammar.HaskellParser
-import org.jetbrains.grammar.dumb.Rule
-import java.util.HashSet
-import com.intellij.psi.tree.IElementType
-import org.jetbrains.grammar.dumb.Term
-import org.jetbrains.grammar.dumb.Variant
-import java.util.HashMap
-import java.util.ArrayList
-import org.jetbrains.grammar.dumb.NonTerminal
-import org.jetbrains.grammar.dumb.Terminal
 
 /**
  * Created by atsky on 11/20/14.
@@ -19,7 +10,7 @@ fun main(args: Array<String>) {
 
     for ((name, rule) in grammar) {
         rule.makeAnalysis(grammar);
-            println("rule ${name} {")
+            println("rule $name {")
             println("  can be empty: " + rule.canBeEmpty)
             println("  first: " + rule.first)
             println("}")

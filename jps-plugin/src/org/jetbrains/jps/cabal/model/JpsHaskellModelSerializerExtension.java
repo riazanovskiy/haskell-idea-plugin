@@ -13,7 +13,6 @@ import org.jetbrains.jps.model.serialization.JpsModelSerializerExtension;
 import org.jetbrains.jps.model.serialization.library.JpsSdkPropertiesSerializer;
 import org.jetbrains.jps.model.serialization.module.JpsModulePropertiesSerializer;
 
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 

@@ -1,30 +1,22 @@
 package org.jetbrains.haskell.debugger.breakpoints
 
-import com.intellij.xdebugger.breakpoints.XBreakpointType
-import com.intellij.xdebugger.breakpoints.XBreakpointProperties
-import com.intellij.xdebugger.breakpoints.XBreakpoint
-import javax.swing.Icon
 import com.intellij.icons.AllIcons
-import com.intellij.openapi.project.Project
-import com.intellij.xdebugger.evaluation.XDebuggerEditorsProvider
-import org.jetbrains.haskell.debugger.HaskellDebuggerEditorsProvider
-import javax.swing.JComponent
+import com.intellij.xdebugger.breakpoints.XBreakpoint
+import com.intellij.xdebugger.breakpoints.XBreakpointType
 import com.intellij.xdebugger.breakpoints.ui.XBreakpointCustomPropertiesPanel
-import com.intellij.debugger.ui.breakpoints.ExceptionBreakpointPropertiesPanel
-import javax.swing.JPanel
-import javax.swing.JLabel
+import javax.swing.Icon
 
 /**
  * Created by vlad on 8/6/14.
  */
 
-public class HaskellExceptionBreakpointType() :
+class HaskellExceptionBreakpointType() :
         XBreakpointType<XBreakpoint<HaskellExceptionBreakpointProperties>, HaskellExceptionBreakpointProperties>(
                 HaskellExceptionBreakpointType.ID,
                 HaskellExceptionBreakpointType.TITLE) {
 
     companion object {
-        public val ID: String = "haskell-exception-breakpoint"
+        val ID: String = "haskell-exception-breakpoint"
         private val TITLE: String = "Haskell exception breakpoints"
     }
 

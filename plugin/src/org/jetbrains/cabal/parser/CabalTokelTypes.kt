@@ -3,14 +3,10 @@ package org.jetbrains.cabal.parser
 import com.intellij.psi.TokenType
 import com.intellij.psi.tree.IElementType
 import com.intellij.psi.tree.TokenSet
-import com.intellij.lang.ASTNode
-import com.intellij.psi.PsiElement
-import com.intellij.extapi.psi.ASTWrapperPsiElement
-import org.jetbrains.cabal.parser.CabalCompositeElementType
-import org.jetbrains.haskell.parser.HaskellTokenType
 import org.jetbrains.cabal.psi.*
+import org.jetbrains.haskell.parser.HaskellTokenType
 
-public object CabalTokelTypes {
+object CabalTokelTypes {
 
     @JvmField
     val COLON                  : IElementType  = HaskellTokenType(":")

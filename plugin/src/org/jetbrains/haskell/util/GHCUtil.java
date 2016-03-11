@@ -51,7 +51,7 @@ public final class GHCUtil {
     @NotNull
     public static GHCVersion getVersion(@Nullable String name) {
         String[] versionStr = name == null ? new String[0] : name.split("[^0-9]");
-        List<Integer> parts = new ArrayList<Integer>();
+        List<Integer> parts = new ArrayList<>();
         for (String part : versionStr) {
             if (part.isEmpty())
                 continue;

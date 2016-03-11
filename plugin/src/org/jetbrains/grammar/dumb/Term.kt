@@ -9,7 +9,7 @@ open class Term {
 
 }
 
-public class Terminal(val tokenType: HaskellTokenType) : Term() {
+class Terminal(val tokenType: HaskellTokenType) : Term() {
     override fun toString(): String {
         return "'" + tokenType.myName + "'"
     }
@@ -25,7 +25,7 @@ public class Terminal(val tokenType: HaskellTokenType) : Term() {
 
 }
 
-public class NonTerminal(val rule: String) : Term() {
+class NonTerminal(val rule: String) : Term() {
     override fun toString(): String {
         return rule
     }

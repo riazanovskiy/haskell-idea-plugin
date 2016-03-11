@@ -1,14 +1,13 @@
 package org.jetbrains.haskell.psi
 
-import com.intellij.lang.ASTNode
 import com.intellij.extapi.psi.ASTWrapperPsiElement
-import com.intellij.psi.util.PsiTreeUtil
+import com.intellij.lang.ASTNode
 
 /**
  * Created by atsky on 23/04/14.
  */
-public class ClassDeclaration(node : ASTNode) : ASTWrapperPsiElement(node) {
+class ClassDeclaration(node : ASTNode) : ASTWrapperPsiElement(node) {
 
-    public fun getType(): HaskellType? =
+    fun getType(): HaskellType? =
             findChildByClass(HaskellType::class.java)
 }

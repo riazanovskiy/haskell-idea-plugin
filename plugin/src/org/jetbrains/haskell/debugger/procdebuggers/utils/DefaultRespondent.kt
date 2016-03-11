@@ -1,15 +1,14 @@
 package org.jetbrains.haskell.debugger.procdebuggers.utils
 
-import org.jetbrains.haskell.debugger.HaskellDebugProcess
-import org.jetbrains.haskell.debugger.frames.HsSuspendContext
-import org.jetbrains.haskell.debugger.utils.HaskellUtils
 import com.intellij.openapi.vfs.LocalFileSystem
-import org.jetbrains.haskell.debugger.frames.HsHistoryFrame
-import org.jetbrains.haskell.debugger.parser.HistoryResult
-import org.jetbrains.haskell.debugger.parser.HsHistoryFrameInfo
+import org.jetbrains.haskell.debugger.HaskellDebugProcess
 import org.jetbrains.haskell.debugger.breakpoints.HaskellLineBreakpointDescription
+import org.jetbrains.haskell.debugger.frames.HsHistoryFrame
+import org.jetbrains.haskell.debugger.frames.HsSuspendContext
+import org.jetbrains.haskell.debugger.parser.HistoryResult
+import org.jetbrains.haskell.debugger.utils.HaskellUtils
 
-public class DefaultRespondent(val debugProcess: HaskellDebugProcess) : DebugRespondent {
+class DefaultRespondent(val debugProcess: HaskellDebugProcess) : DebugRespondent {
 
     private val session = debugProcess.session!!
 

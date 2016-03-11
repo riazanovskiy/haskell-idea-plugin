@@ -1,31 +1,19 @@
 package org.jetbrains.haskell.debugger.parser
 
-import org.junit.Test as test
-
 //import kotlin.test.assertEquals
 //import kotlin.test.assertTrue
 //import kotlin.test.assertFalse
 //import kotlin.test.fail
-import org.jetbrains.haskell.debugger.parser.BreakpointCommandResult
-import org.jetbrains.haskell.debugger.parser.HsFilePosition
-import org.jetbrains.haskell.debugger.parser.GHCiParser
-import java.util.LinkedList
-import org.jetbrains.haskell.debugger.parser.HsStackFrameInfo
-import java.util.ArrayList
-import org.jetbrains.haskell.debugger.parser.LocalBinding
-import org.jetbrains.haskell.debugger.parser.MoveHistResult
-import org.jetbrains.haskell.debugger.parser.LocalBindingList
-import org.jetbrains.haskell.debugger.parser.ExpressionType
-import org.jetbrains.haskell.debugger.parser.HistoryResult
-import org.jetbrains.haskell.debugger.parser.HsHistoryFrameInfo
 import org.junit.Assert
+import java.util.*
+import org.junit.Test as test
 
 /**
  * Tests for GHCiParser class
  *
  * @author Habibullin Marat
  */
-public class GHCiParserTests {
+class GHCiParserTests {
     @test fun parseSetBreakpointCommandResultColumnsRangeTest() {
         val outputWithColumnsRange = "Breakpoint 0 activated at /home/marat-x/IdeaProjects/HaskellTestModule/src/Mine.hs:3:12-13"
         var expected: BreakpointCommandResult? = BreakpointCommandResult(0, HsFilePosition("/home/marat-x/IdeaProjects/HaskellTestModule/src/Mine.hs", 3, 12, 3, 13))

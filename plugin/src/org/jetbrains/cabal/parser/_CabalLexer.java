@@ -2,10 +2,8 @@
 
 package org.jetbrains.cabal.parser;
 
-import java.util.*;
 import com.intellij.lexer.*;
 import com.intellij.psi.*;
-import org.jetbrains.haskell.parser.token.*;
 import com.intellij.psi.tree.IElementType;
 
 
@@ -444,10 +442,7 @@ class _CabalLexer implements FlexLexer {
             zzMarkedPosL = zzMarkedPos;
             zzEndReadL = zzEndRead;
             zzBufferL = zzBuffer;
-            if (eof) 
-              zzAtBOL = false;
-            else 
-              zzAtBOL = zzBufferL[zzMarkedPosL] != '\n';
+            zzAtBOL = !eof && zzBufferL[zzMarkedPosL] != '\n';
           }
           break;
         default:

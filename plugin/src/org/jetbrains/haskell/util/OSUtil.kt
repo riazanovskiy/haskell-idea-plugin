@@ -1,18 +1,15 @@
 package org.jetbrains.haskell.util
 
-import java.io.File
-
-public object OSUtil {
+object OSUtil {
     val newLine = System.getProperty("line.separator").toString();
 
     val osName = System.getProperty("os.name")!!.toLowerCase();
 
-    public val isWindows: Boolean = (osName.indexOf("win") >= 0)
+    val isWindows: Boolean = (osName.indexOf("win") >= 0)
 
-    public val isMac: Boolean = (osName.indexOf("mac") >= 0) || (osName.indexOf("darwin") >= 0);
+    val isMac: Boolean = (osName.indexOf("mac") >= 0) || (osName.indexOf("darwin") >= 0);
 
-    @JvmStatic
-    public fun getCabalData(): String {
+    @JvmStatic fun getCabalData(): String {
         return if (isWindows) {
             joinPath(System.getenv("AppData")!!, "cabal")
         } else if (isMac) {
@@ -22,8 +19,7 @@ public object OSUtil {
         }
     }
 
-    @JvmStatic
-    public fun getCabalConfig(): String {
+    @JvmStatic fun getCabalConfig(): String {
         return if (isWindows) {
             joinPath(System.getenv("AppData")!!, "cabal", "config")
         } else {
@@ -31,8 +27,7 @@ public object OSUtil {
         }
     }
 
-    @JvmStatic
-    public fun getDefaultCabalBin(): String = joinPath(getCabalData(), "bin")
+    @JvmStatic fun getDefaultCabalBin(): String = joinPath(getCabalData(), "bin")
 
     fun getProgramDataFolder(name: String): String {
         return if (isWindows) {

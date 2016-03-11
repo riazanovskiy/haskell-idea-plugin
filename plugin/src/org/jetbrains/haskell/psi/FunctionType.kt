@@ -1,11 +1,10 @@
 package org.jetbrains.haskell.psi
 
-import com.intellij.lang.ASTNode
 import com.intellij.extapi.psi.ASTWrapperPsiElement
-import com.intellij.psi.PsiElement
+import com.intellij.lang.ASTNode
 
 
 /**
  * Created by atsky on 10/04/14.
  */
-public class FunctionType(node : ASTNode) : ASTWrapperPsiElement(node)
+class FunctionType(node : ASTNode) : ASTWrapperPsiElement(node)

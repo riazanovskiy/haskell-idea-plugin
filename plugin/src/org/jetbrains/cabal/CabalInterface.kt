@@ -1,60 +1,56 @@
 package org.jetbrains.cabal
 
+import com.intellij.notification.Notification
+import com.intellij.notification.NotificationType
+import com.intellij.notification.Notifications
 import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.editor.Document
 import com.intellij.openapi.fileEditor.FileDocumentManager
+import com.intellij.openapi.module.Module
+import com.intellij.openapi.module.ModuleUtilCore
+import com.intellij.openapi.progress.ProgressIndicator
+import com.intellij.openapi.progress.ProgressManager
+import com.intellij.openapi.progress.Task
 import com.intellij.openapi.project.Project
+import com.intellij.openapi.util.Key
+import com.intellij.openapi.util.SystemInfo
 import com.intellij.openapi.vfs.VirtualFile
-import com.intellij.openapi.wm.ToolWindow
 import com.intellij.openapi.wm.ToolWindowId
 import com.intellij.openapi.wm.ToolWindowManager
+import com.intellij.psi.PsiElement
+import com.intellij.psi.PsiManager
 import com.intellij.ui.content.Content
 import com.intellij.ui.content.ContentFactory
 import com.intellij.ui.content.MessageView
 import org.jetbrains.cabal.tool.CabalMessageView
-import org.jetbrains.haskell.util.ProcessRunner
-import javax.swing.*
-import java.io.IOException
-import com.intellij.openapi.util.Key
-import com.intellij.notification.Notifications
-import com.intellij.notification.Notification
-import com.intellij.notification.NotificationType
-import com.intellij.psi.PsiFile
-import com.intellij.openapi.roots.ProjectRootManager
-import com.intellij.openapi.module.Module
-import com.intellij.psi.PsiManager
-import java.util.ArrayList
-import java.util.TreeMap
-import org.jetbrains.haskell.util.*
-import java.io.File
-import java.util.LinkedList
-import com.intellij.openapi.util.SystemInfo
 import org.jetbrains.haskell.config.HaskellSettings
-import com.intellij.openapi.progress.ProgressManager
-import com.intellij.openapi.progress.Task
-import com.intellij.openapi.progress.ProgressIndicator
-import com.intellij.openapi.module.ModuleUtilCore
-import com.intellij.psi.PsiElement
+import org.jetbrains.haskell.util.OSUtil
+import org.jetbrains.haskell.util.ProcessRunner
+import org.jetbrains.haskell.util.joinPath
+import org.jetbrains.haskell.util.readLines
+import java.io.File
+import java.io.IOException
+import java.util.*
 
 private val KEY: Key<CabalMessageView> = Key.create("CabalMessageView.KEY")!!
 
-public class CabalPackageShort(
+class CabalPackageShort(
         val name: String,
         val availableVersions: List<String>,
         val isInstalled: Boolean)
 
 val cabalLock = Object()
 
-public class CabalInterface(val project: Project) {
+class CabalInterface(val project: Project) {
 
     companion object {
-        public fun findCabal(module: Module): VirtualFile? {
-            val children = module.getModuleFile()?.getParent()?.getChildren()
+        fun findCabal(module: Module): VirtualFile? {
+            val children = module.moduleFile?.parent?.children
             var cabalFile: VirtualFile? = null;
 
             if (children != null) {
                 for (file in children) {
-                    if ("cabal".equals(file.getExtension())) {
+                    if ("cabal".equals(file.extension)) {
                         cabalFile = file;
                         break;
                     }
@@ -66,18 +62,18 @@ public class CabalInterface(val project: Project) {
             return null;
         }
 
-        public fun findCabal(file: PsiElement): VirtualFile? {
+        fun findCabal(file: PsiElement): VirtualFile? {
             val module = ModuleUtilCore.findModuleForPsiElement(file)
             return findCabal(module!!)
         }
     }
 
     fun getProgramPath(): String {
-        return HaskellSettings.getInstance().getState().cabalPath!!
+        return HaskellSettings.getInstance().state.cabalPath!!
     }
 
     fun getDataPath(): String {
-        return HaskellSettings.getInstance().getState().cabalDataPath!!
+        return HaskellSettings.getInstance().state.cabalDataPath!!
     }
 
 
@@ -90,18 +86,18 @@ public class CabalInterface(val project: Project) {
         val process = ProcessRunner(canonicalPath).getProcess(command)
         ApplicationManager.getApplication()!!.invokeLater({
             val ijMessageView = MessageView.SERVICE.getInstance(project)!!
-            for (content in ijMessageView.getContentManager()!!.getContents()) {
+            for (content in ijMessageView.contentManager!!.contents) {
                 val cabalMessageView = content.getUserData(KEY)
                 if (cabalMessageView != null) {
-                    ijMessageView.getContentManager()?.removeContent(content, true)
+                    ijMessageView.contentManager?.removeContent(content, true)
                 }
             }
             val cabalMessageView = CabalMessageView(project, process)
-            val content: Content = ContentFactory.SERVICE.getInstance()!!.createContent(cabalMessageView.getComponent(), "Cabal console", true)
+            val content: Content = ContentFactory.SERVICE.getInstance()!!.createContent(cabalMessageView.component, "Cabal console", true)
             content.putUserData(KEY, cabalMessageView)
 
-            ijMessageView.getContentManager()!!.addContent(content)
-            ijMessageView.getContentManager()!!.setSelectedContent(content)
+            ijMessageView.contentManager!!.addContent(content)
+            ijMessageView.contentManager!!.setSelectedContent(content)
 
             val messageToolWindow = ToolWindowManager.getInstance(project)?.getToolWindow(ToolWindowId.MESSAGES_WINDOW)
             messageToolWindow?.activate(null)
@@ -110,7 +106,7 @@ public class CabalInterface(val project: Project) {
         return process
     }
 
-    public fun checkVersion(): Boolean {
+    fun checkVersion(): Boolean {
         try {
             ProcessRunner(null).executeOrFail(getProgramPath(), "-V")
             return true;
@@ -119,32 +115,26 @@ public class CabalInterface(val project: Project) {
         }
     }
 
-    public fun configure(cabalFile: VirtualFile): Process {
-        return runCommand(cabalFile.getParent()!!.getCanonicalPath()!!, "configure")
+    fun configure(cabalFile: VirtualFile): Process {
+        return runCommand(cabalFile.parent!!.canonicalPath!!, "configure")
     }
 
-    public fun build(cabalFile: VirtualFile): Process {
-        return runCommand(cabalFile.getParent()!!.getCanonicalPath()!!, "build")
+    fun build(cabalFile: VirtualFile): Process {
+        return runCommand(cabalFile.parent!!.canonicalPath!!, "build")
     }
 
-    public fun clean(cabalFile: VirtualFile): Process {
-        return runCommand(cabalFile.getParent()!!.getCanonicalPath()!!, "clean")
+    fun clean(cabalFile: VirtualFile): Process {
+        return runCommand(cabalFile.parent!!.canonicalPath!!, "clean")
     }
 
     private fun findCabal(): String? {
-        for (file: VirtualFile in project.getBaseDir()!!.getChildren()!!) {
-            if ("cabal".equals(file.getExtension())) {
+        for (file: VirtualFile in project.baseDir!!.children!!) {
+            if ("cabal".equals(file.extension)) {
                 val cachedDocument: Document? = FileDocumentManager.getInstance().getCachedDocument(file)
                 if (cachedDocument != null) {
-                    ApplicationManager.getApplication()!!.runWriteAction(object : Runnable {
-                        public override fun run(): Unit {
-                            FileDocumentManager.getInstance().saveDocument(cachedDocument)
-                        }
-
-
-                    })
+                    ApplicationManager.getApplication()!!.runWriteAction({ FileDocumentManager.getInstance().saveDocument(cachedDocument) })
                 }
-                return file.getParent()?.getCanonicalPath()!!
+                return file.parent?.canonicalPath!!
             }
 
         }
@@ -157,7 +147,7 @@ public class CabalInterface(val project: Project) {
     }
 
 
-    public fun getPackagesList(): List<CabalPackageShort> {
+    fun getPackagesList(): List<CabalPackageShort> {
         try {
             val path = joinPath(getRepo(), "00-index.cache")
 
@@ -205,7 +195,7 @@ public class CabalInterface(val project: Project) {
     }
 
 
-    public fun getInstalledPackagesList(): List<CabalPackageShort> {
+    fun getInstalledPackagesList(): List<CabalPackageShort> {
         try {
             val ghcPkg = if (OSUtil.isMac && File("/usr/local/bin/ghc-pkg").exists()) {
                 "/usr/local/bin/ghc-pkg"
@@ -251,22 +241,22 @@ public class CabalInterface(val project: Project) {
         }
     }
 
-    public fun update(): Unit {
+    fun update(): Unit {
         ProgressManager.getInstance().run(object : Task.Backgroundable(project, "cabal update", false) {
             override fun run(indicator: ProgressIndicator) {
                 synchronized(cabalLock) {
-                    val process = runCommand(project.getBasePath()!!.toString(), "update")
+                    val process = runCommand(project.basePath!!.toString(), "update")
                     process.waitFor();
                 }
             }
         });
     }
 
-    public fun install(pkg: String) {
+    fun install(pkg: String) {
         ProgressManager.getInstance().run(object : Task.Backgroundable(project, "cabal install " + pkg, false) {
             override fun run(indicator: ProgressIndicator) {
                 synchronized(cabalLock) {
-                    val process = runCommand(project.getBasePath()!!.toString(), "install", pkg)
+                    val process = runCommand(project.basePath!!.toString(), "install", pkg)
                     process.waitFor()
                 }
             }

@@ -1,26 +1,23 @@
 package org.jetbrains.haskell.external.tool
 
-import com.intellij.execution.impl.ConsoleViewImpl
-import com.intellij.openapi.project.Project
-import com.intellij.openapi.components.ProjectComponent
 import com.intellij.execution.impl.ConsoleViewUtil
-import com.intellij.openapi.editor.Editor
-import com.intellij.openapi.editor.ex.EditorEx
-import com.intellij.openapi.editor.EditorFactory
-import com.intellij.openapi.application.ApplicationManager
-import com.intellij.openapi.editor.markup.HighlighterTargetArea
-import com.intellij.openapi.editor.markup.HighlighterLayer
-import com.intellij.notification.NotificationType
-import com.intellij.openapi.editor.colors.EditorColorsManager
 import com.intellij.execution.ui.ConsoleViewContentType
+import com.intellij.openapi.application.ApplicationManager
+import com.intellij.openapi.components.ProjectComponent
+import com.intellij.openapi.editor.EditorFactory
 import com.intellij.openapi.editor.LogicalPosition
 import com.intellij.openapi.editor.ScrollType
+import com.intellij.openapi.editor.colors.EditorColorsManager
 import com.intellij.openapi.editor.colors.TextAttributesKey
+import com.intellij.openapi.editor.ex.EditorEx
+import com.intellij.openapi.editor.markup.HighlighterLayer
+import com.intellij.openapi.editor.markup.HighlighterTargetArea
+import com.intellij.openapi.project.Project
 
 /**
  * Created by atsky on 06/01/15.
  */
-public class GhcModConsole(val project: Project) : ProjectComponent {
+class GhcModConsole(val project: Project) : ProjectComponent {
     var editor : EditorEx? = null
 
     override fun getComponentName(): String = "GhcModConsole"
@@ -33,7 +30,7 @@ public class GhcModConsole(val project: Project) : ProjectComponent {
 
     override fun projectOpened() {
         editor = ConsoleViewUtil.setupConsoleEditor(project, false, false);
-        editor!!.getSettings().setUseSoftWraps(true)
+        editor!!.settings.isUseSoftWraps = true
     }
 
     override fun projectClosed() {
@@ -49,24 +46,24 @@ public class GhcModConsole(val project: Project) : ProjectComponent {
 
     fun append(text: String, type : MessageType) {
         ApplicationManager.getApplication().invokeLater({
-            val document = editor!!.getDocument()
+            val document = editor!!.document
 
-            val msgStart = document.getTextLength()
-            document.insertString(document.getTextLength(), text)
+            val msgStart = document.textLength
+            document.insertString(document.textLength, text)
             val layer = HighlighterLayer.CARET_ROW + 1
 
             val attributes = EditorColorsManager.getInstance()
-                    .getGlobalScheme().getAttributes(type.key);
+                    .globalScheme.getAttributes(type.key);
 
-            editor?.getMarkupModel()?.addRangeHighlighter(
+            editor?.markupModel?.addRangeHighlighter(
                     msgStart,
-                    document.getTextLength(),
+                    document.textLength,
                     layer,
                     attributes,
                     HighlighterTargetArea.EXACT_RANGE)
 
-            val line = document.getLineCount() - 1
-            editor?.getScrollingModel()?.scrollTo(LogicalPosition(line, 0), ScrollType.MAKE_VISIBLE)
+            val line = document.lineCount - 1
+            editor?.scrollingModel?.scrollTo(LogicalPosition(line, 0), ScrollType.MAKE_VISIBLE)
 
         });
     }

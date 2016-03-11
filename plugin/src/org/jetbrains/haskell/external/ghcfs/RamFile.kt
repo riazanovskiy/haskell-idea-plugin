@@ -1,19 +1,18 @@
 package org.jetbrains.haskell.external.ghcfs
 
+import com.intellij.openapi.project.Project
 import com.intellij.openapi.vfs.VirtualFile
 import com.intellij.openapi.vfs.VirtualFileSystem
-import java.io.InputStream
-import java.io.ByteArrayInputStream
-import java.io.OutputStream
-import com.intellij.psi.PsiDocumentManager
-import com.intellij.openapi.project.Project
-import com.intellij.psi.PsiManager
 import com.intellij.psi.PsiFile
+import com.intellij.psi.PsiManager
+import java.io.ByteArrayInputStream
+import java.io.InputStream
+import java.io.OutputStream
 
 /**
  * Created by atsky on 11/12/14.
  */
-public class RamFile(val fileName: String, val content : String) : VirtualFile() {
+class RamFile(val fileName: String, val content : String) : VirtualFile() {
 
     override fun getName(): String {
         return fileName

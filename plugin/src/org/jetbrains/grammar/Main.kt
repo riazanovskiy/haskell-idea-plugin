@@ -1,38 +1,21 @@
 package org.jetbrains.grammar
 
-import java.io.File
-import java.io.FileReader
-import org.jetbrains.haskell.parser.lexer.HaskellLexer
-import com.intellij.lang.PsiBuilder
-import com.intellij.lang.impl.PsiBuilderImpl
-import java.util.ArrayList
-import com.intellij.psi.tree.IElementType
-import com.intellij.psi.TokenType
-import org.jetbrains.haskell.parser.token.NEW_LINE
-import org.jetbrains.haskell.parser.token.COMMENTS
-import java.io.FilenameFilter
-import java.io.FileWriter
-import java.io.PrintStream
 import org.jetbrains.grammar.dumb.LazyLLParser
-import org.jetbrains.haskell.parser.getCachedTokens
-import org.jetbrains.haskell.parser.newLexerState
-import java.io.BufferedReader
-import org.jetbrains.haskell.parser.CachedTokens
 import org.jetbrains.grammar.dumb.Rule
+import org.jetbrains.haskell.parser.CachedTokens
+import org.jetbrains.haskell.parser.getCachedTokens
+import org.jetbrains.haskell.parser.lexer.HaskellLexer
+import org.jetbrains.haskell.parser.newLexerState
+import java.io.*
 
 /**
  * Created by atsky on 15/11/14.
  */
 fun main(args : Array<String>) {
     val path = File("./data")
-    val filter = object : FilenameFilter {
-        override fun accept(dir: File, name: String): Boolean {
-            return name.endsWith("Test.hs")
-        }
-
-    }
+    val filter = FilenameFilter { dir, name -> name.endsWith("Test.hs") }
     for (file in path.listFiles(filter)) {
-        val name = file.getName()
+        val name = file.name
         parseFile(file, File(path, name.substring(0, name.length - 3) + "_tree.txt"))
     }
 }
@@ -77,7 +60,7 @@ private fun evaluateManyTimes(cachedTokens: CachedTokens, grammar: MutableMap<St
         parser.parse()
     }
     val time = System.currentTimeMillis() - start
-    println("time = ${time}")
+    println("time = $time")
 }
 
 fun readData(file: File): String {

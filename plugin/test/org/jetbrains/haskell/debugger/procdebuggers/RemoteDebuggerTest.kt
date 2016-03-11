@@ -1,26 +1,21 @@
 package org.jetbrains.haskell.debugger.procdebuggers
 
-import org.jetbrains.haskell.debugger.procdebuggers.utils.DebugRespondent
-import java.io.File
-import com.intellij.execution.ExecutionException
-import org.jetbrains.haskell.debugger.procdebuggers.utils.RemoteDebugStreamHandler
-import org.jetbrains.haskell.debugger.config.HaskellDebugSettings
-import java.util.ArrayList
-import org.jetbrains.haskell.debugger.prochandlers.RemoteProcessHandler
-import org.jetbrains.haskell.debugger.prochandlers.HaskellDebugProcessHandler
+//import kotlin.test.assertNotNull
 import com.intellij.execution.process.OSProcessHandler
 import com.intellij.execution.process.ProcessListener
 import org.jetbrains.haskell.debugger.RemoteDebugProcessStateUpdater
-//import kotlin.test.assertNotNull
-import org.jetbrains.haskell.debugger.GHCiDebugProcessStateUpdater
+import org.jetbrains.haskell.debugger.procdebuggers.utils.DebugRespondent
+import org.jetbrains.haskell.debugger.procdebuggers.utils.RemoteDebugStreamHandler
 import org.junit.Assert
+import java.io.File
+import java.util.*
 
-public class RemoteDebuggerTest : DebuggerTest<RemoteDebugger>() {
+class RemoteDebuggerTest : DebuggerTest<RemoteDebugger>() {
 
     companion object {
-        public val pathPropertyName: String = "remotePath"
+        val pathPropertyName: String = "remotePath"
 
-        public class TestRemoteProcessHandler(process: Process, val streamHandler: RemoteDebugStreamHandler,
+        class TestRemoteProcessHandler(process: Process, val streamHandler: RemoteDebugStreamHandler,
                                               listener: ProcessListener) : OSProcessHandler(process, null, null) {
             init {
                 streamHandler.processHandler = this
@@ -37,7 +32,7 @@ public class RemoteDebuggerTest : DebuggerTest<RemoteDebugger>() {
     private var listener: RemoteDebugProcessStateUpdater? = null
 
     override fun createDebugger(file: File, respondent: DebugRespondent): RemoteDebugger {
-        val filePath = file.getAbsolutePath()
+        val filePath = file.absolutePath
 
         val streamHandler = RemoteDebugStreamHandler()
         streamHandler.start()
@@ -45,7 +40,7 @@ public class RemoteDebuggerTest : DebuggerTest<RemoteDebugger>() {
         val debuggerPath = DebuggerTest.properties?.getProperty(pathPropertyName)
         Assert.assertNotNull(debuggerPath, "Path to remote debugger not found ($pathPropertyName property inside unittest.properties)")
 
-        val command: ArrayList<String> = arrayListOf(debuggerPath!!, "-m${filePath}", "-p${streamHandler.getPort()}")
+        val command: ArrayList<String> = arrayListOf(debuggerPath!!, "-m$filePath", "-p${streamHandler.getPort()}")
         val builder = ProcessBuilder(command)
         listener = RemoteDebugProcessStateUpdater()
         val handler = TestRemoteProcessHandler(builder.start(), streamHandler, listener!!)

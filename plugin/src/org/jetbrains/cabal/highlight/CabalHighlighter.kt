@@ -1,22 +1,21 @@
 package org.jetbrains.cabal.highlight
 
 import com.intellij.lexer.Lexer
+import com.intellij.openapi.editor.DefaultLanguageHighlighterColors
+import com.intellij.openapi.editor.HighlighterColors
 import com.intellij.openapi.editor.colors.TextAttributesKey
 import com.intellij.openapi.fileTypes.SyntaxHighlighterBase
 import com.intellij.psi.tree.IElementType
 import gnu.trove.THashMap
 import org.jetbrains.cabal.parser.CabalLexer
 import org.jetbrains.cabal.parser.CabalTokelTypes
-import org.jetbrains.haskell.highlight.HaskellHighlighter
-import com.intellij.openapi.editor.HighlighterColors
-import com.intellij.openapi.editor.DefaultLanguageHighlighterColors
 
-public class CabalHighlighter : SyntaxHighlighterBase() {
+class CabalHighlighter : SyntaxHighlighterBase() {
     companion object {
-        public val CABAL_STRING_LITERAL: TextAttributesKey = TextAttributesKey.createTextAttributesKey("CABAL_STRING_LITERAL", DefaultLanguageHighlighterColors.STRING)
-        public val CABAL_COMMENT: TextAttributesKey = TextAttributesKey.createTextAttributesKey("CABAL_COMMENT", DefaultLanguageHighlighterColors.LINE_COMMENT)
-        public val CABAL_PROPERTY: TextAttributesKey = TextAttributesKey.createTextAttributesKey("CABAL_KEYWORD", DefaultLanguageHighlighterColors.KEYWORD)
-        public val CABAL_COLON: TextAttributesKey = TextAttributesKey.createTextAttributesKey("CABAL_COLON", DefaultLanguageHighlighterColors.SEMICOLON)
+        val CABAL_STRING_LITERAL: TextAttributesKey = TextAttributesKey.createTextAttributesKey("CABAL_STRING_LITERAL", DefaultLanguageHighlighterColors.STRING)
+        val CABAL_COMMENT: TextAttributesKey = TextAttributesKey.createTextAttributesKey("CABAL_COMMENT", DefaultLanguageHighlighterColors.LINE_COMMENT)
+        val CABAL_PROPERTY: TextAttributesKey = TextAttributesKey.createTextAttributesKey("CABAL_KEYWORD", DefaultLanguageHighlighterColors.KEYWORD)
+        val CABAL_COLON: TextAttributesKey = TextAttributesKey.createTextAttributesKey("CABAL_COLON", DefaultLanguageHighlighterColors.SEMICOLON)
     }
 
 
@@ -25,7 +24,7 @@ public class CabalHighlighter : SyntaxHighlighterBase() {
     }
 
     override fun getTokenHighlights(tokenType: IElementType): Array<TextAttributesKey> {
-        return SyntaxHighlighterBase.pack(keys1.get(tokenType))
+        return SyntaxHighlighterBase.pack(keys1[tokenType])
     }
 
 

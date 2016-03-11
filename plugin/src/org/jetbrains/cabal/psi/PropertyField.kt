@@ -1,17 +1,11 @@
 package org.jetbrains.cabal.psi
 
 import com.intellij.lang.ASTNode
-import org.jetbrains.cabal.psi.Field
-import org.jetbrains.cabal.highlight.ErrorMessage
-import com.intellij.psi.impl.source.tree.SharedImplUtil
 import com.intellij.psi.PsiElement
-import com.intellij.psi.tree.IElementType
-import java.util.ArrayList
-import com.intellij.psi.util.PsiTreeUtil
 
-public open class PropertyField(node: ASTNode) : Field(node) {
+open class PropertyField(node: ASTNode) : Field(node) {
 
-    public fun getKeyNode(): PsiElement = getFirstChild()!!
+    fun getKeyNode(): PsiElement = firstChild!!
 
-    public fun getPropertyName(): String = getKeyNode().getText()!!
+    fun getPropertyName(): String = getKeyNode().text!!
 }

@@ -1,13 +1,11 @@
 package org.jetbrains.haskell.sdk
 
-import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.projectRoots.AdditionalDataConfigurable
 import com.intellij.openapi.projectRoots.Sdk
-import com.intellij.openapi.projectRoots.SdkAdditionalData
-import com.intellij.openapi.projectRoots.SdkModificator
-import javax.swing.*
+import javax.swing.JComponent
+import javax.swing.JPanel
 
-public class HaskellSdkConfigurable() : AdditionalDataConfigurable {
+class HaskellSdkConfigurable() : AdditionalDataConfigurable {
     private val myForm: HaskellSdkConfigurableForm = HaskellSdkConfigurableForm()
 
     private var mySdk: Sdk? = null

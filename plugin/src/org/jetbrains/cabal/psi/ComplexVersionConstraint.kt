@@ -1,23 +1,18 @@
 package org.jetbrains.cabal.psi
 
 import com.intellij.lang.ASTNode
-import com.intellij.extapi.psi.ASTWrapperPsiElement
-import org.jetbrains.cabal.psi.PropertyValue
-import org.jetbrains.cabal.psi.VersionConstraint
-import com.intellij.psi.util.PsiTreeUtil
 import com.intellij.psi.PsiElement
 import org.jetbrains.cabal.parser.CabalTokelTypes
-import java.lang.IllegalStateException
 
-public class ComplexVersionConstraint(node: ASTNode) : PropertyValue(node)  {
+class ComplexVersionConstraint(node: ASTNode) : PropertyValue(node)  {
 
-    public fun satisfyConstraint(givenVersion: String): Boolean {
-        val elements = getChildren().filter { it is VersionConstraint }
+    fun satisfyConstraint(givenVersion: String): Boolean {
+        val elements = children.filter { it is VersionConstraint }
 
         fun findLogicOrNullFromRange(startOffset: Int, endOffset: Int): PsiElement? {
             for (i in startOffset..endOffset - 1) {
                 val res = findElementAt(i)
-                if ((res?.getNode()?.getElementType() == CabalTokelTypes.LOGIC)) return res
+                if ((res?.node?.elementType == CabalTokelTypes.LOGIC)) return res
             }
             return null
         }
@@ -29,8 +24,7 @@ public class ComplexVersionConstraint(node: ASTNode) : PropertyValue(node)  {
 
         for (i in elements.indices) {
             if (i == 0) continue
-            val logic = findLogicOrNullFromRange(elements[i - 1].getTextRange()!!.getEndOffset() - getTextOffset(), elements[i].getStartOffsetInParent())?.getText()
-            if (logic == null) throw IllegalStateException()
+            val logic = findLogicOrNullFromRange(elements[i - 1].textRange!!.endOffset - textOffset, elements[i].startOffsetInParent)?.text ?: throw IllegalStateException()
             if (logic == "||") {
                 res = res || checkConstraint(i)
             }

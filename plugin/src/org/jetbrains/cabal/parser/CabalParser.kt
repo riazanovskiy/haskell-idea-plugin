@@ -1,17 +1,15 @@
 package org.jetbrains.cabal.parser
 
-import com.intellij.psi.tree.IElementType
-import com.intellij.psi.TokenType
+import com.intellij.lang.ASTNode
 import com.intellij.lang.PsiBuilder
 import com.intellij.lang.PsiBuilder.Marker
-import com.intellij.lang.ASTNode
-import org.jetbrains.cabal.parser.*
+import com.intellij.psi.TokenType
+import com.intellij.psi.tree.IElementType
 import org.jetbrains.haskell.parser.rules.BaseParser
-import org.jetbrains.haskell.parser.HaskellTokenType
 
-public class CabalParser(root: IElementType, builder: PsiBuilder) : BaseParser(root, builder) {
+class CabalParser(root: IElementType, builder: PsiBuilder) : BaseParser(root, builder) {
 
-    public fun parse(): ASTNode = parseInternal(root)
+    fun parse(): ASTNode = parseInternal(root)
 
     fun canParse(parse: () -> Boolean): Boolean {
         val marker = builder.mark()
@@ -26,13 +24,13 @@ public class CabalParser(root: IElementType, builder: PsiBuilder) : BaseParser(r
     }
 
     fun nextLevel() : Int? {                                  //there can never be two NEW_LINE_INDENT's next to each other
-        if ((!builder.eof()) && (builder.getTokenType() == TokenType.NEW_LINE_INDENT)) {
-            return indentSize(builder.getTokenText()!!)
+        if ((!builder.eof()) && (builder.tokenType == TokenType.NEW_LINE_INDENT)) {
+            return indentSize(builder.tokenText!!)
         }
         return null
     }
 
-    fun isLastOnThisLine() : Boolean = builder.eof() || (builder.getTokenType() == TokenType.NEW_LINE_INDENT)
+    fun isLastOnThisLine() : Boolean = builder.eof() || (builder.tokenType == TokenType.NEW_LINE_INDENT)
 
     fun skipNewLineBiggerLevel(prevLevel: Int) {
         val nextIndent = nextLevel()
@@ -115,8 +113,8 @@ public class CabalParser(root: IElementType, builder: PsiBuilder) : BaseParser(r
     fun parseTokenValue(elemType: IElementType) = start(elemType) {
 
         fun nextTokenIsValid() = !isLastOnThisLine()
-                              && (builder.getTokenType() != CabalTokelTypes.COMMA)
-                              && (builder.getTokenType() != CabalTokelTypes.TAB)
+                              && (builder.tokenType != CabalTokelTypes.COMMA)
+                              && (builder.tokenType != CabalTokelTypes.TAB)
 
         fun emptySpaceBeforeNext()
                 = ((builder.rawLookup(-1) == TokenType.WHITE_SPACE) || (builder.rawLookup(-1) == CabalTokelTypes.COMMENT))
@@ -202,7 +200,7 @@ public class CabalParser(root: IElementType, builder: PsiBuilder) : BaseParser(r
     }
 
     fun parseSimpleCondition(prevLevel: Int) = start(CabalTokelTypes.SIMPLE_CONDITION) {
-        val testName = builder.getTokenText()
+        val testName = builder.tokenText
         if (parseBool()) {
             true
         }
@@ -219,10 +217,10 @@ public class CabalParser(root: IElementType, builder: PsiBuilder) : BaseParser(r
     }
 
     fun parseInvalidConditionPart() = start(CabalTokelTypes.INVALID_CONDITION_PART) {
-        while (!builder.eof() && (builder.getTokenType() != CabalTokelTypes.LOGIC)
-                                        && (builder.getTokenType() != CabalTokelTypes.CLOSE_PAREN)
-                                        && (builder.getTokenType() != TokenType.NEW_LINE_INDENT)) {
-            if ((builder.getTokenText() == "flag") && token(CabalTokelTypes.ID) && token(CabalTokelTypes.OPEN_PAREN)) {
+        while (!builder.eof() && (builder.tokenType != CabalTokelTypes.LOGIC)
+                                        && (builder.tokenType != CabalTokelTypes.CLOSE_PAREN)
+                                        && (builder.tokenType != TokenType.NEW_LINE_INDENT)) {
+            if ((builder.tokenText == "flag") && token(CabalTokelTypes.ID) && token(CabalTokelTypes.OPEN_PAREN)) {
                 parseIdValue(CabalTokelTypes.NAME)
             }
             else builder.advanceLexer()
@@ -284,7 +282,7 @@ public class CabalParser(root: IElementType, builder: PsiBuilder) : BaseParser(r
 
     fun parseFieldFrom(level: Int, fields: Map<String, Pair<IElementType, CabalParser.(Int) -> Boolean>>) : Boolean {
         for (key in fields.keys) {
-            if (parseField(level, key, fields.get(key)!!.first, fields.get(key)!!.second)) return true
+            if (parseField(level, key, fields[key]!!.first, fields[key]!!.second)) return true
         }
         return false
     }
@@ -298,8 +296,7 @@ public class CabalParser(root: IElementType, builder: PsiBuilder) : BaseParser(r
 
         var currentLevel : Int? = null
         while (!builder.eof()) {
-            val level = nextLevel()
-            if (level == null) return false
+            val level = nextLevel() ?: return false
             if (((currentLevel == null) || (level != currentLevel)) && (level <= prevLevel)) {
                 return true                                                                       //sections without any field is allowed
             }
@@ -329,7 +326,7 @@ public class CabalParser(root: IElementType, builder: PsiBuilder) : BaseParser(r
     fun parseRepoKinds() = (parseIdValue(CabalTokelTypes.REPO_KIND) && parseIdValue(CabalTokelTypes.REPO_KIND)) || true
 
     fun parseExactSection(level: Int, key: String, parseAfterInfo: CabalParser.(Int) -> Boolean, parseBody: (Int) -> Boolean)
-                                                                                                     = start(SECTION_TYPES.get(key)!!) {
+                                                                                                     = start(SECTION_TYPES[key]!!) {
         if (parseSectionType(key)) {
             (parseAfterInfo(level) && isLastOnThisLine()) || parseInvalidLine()
             parseProperties(level, { parseBody(it) }, canContainIf = (key in BUILD_INFO_SECTIONS) || (key in IF_ELSE))
@@ -337,11 +334,11 @@ public class CabalParser(root: IElementType, builder: PsiBuilder) : BaseParser(r
         else false
     }
 
-    fun parseTopSection(level: Int, key: String) = parseExactSection(level, key, SECTIONS.get(key)!!.first) {
-        parseFieldFrom(it, SECTIONS.get(key)!!.second!!)
+    fun parseTopSection(level: Int, key: String) = parseExactSection(level, key, SECTIONS[key]!!.first) {
+        parseFieldFrom(it, SECTIONS[key]!!.second!!)
     }
 
-    fun parseIfOrElse(level: Int, key: String, parseFields: CabalParser.(Int) -> Boolean) = parseExactSection(level, key, SECTIONS.get(key)!!.first) {
+    fun parseIfOrElse(level: Int, key: String, parseFields: CabalParser.(Int) -> Boolean) = parseExactSection(level, key, SECTIONS[key]!!.first) {
         parseFields(it)
     }
 
@@ -392,6 +389,6 @@ public class CabalParser(root: IElementType, builder: PsiBuilder) : BaseParser(r
 
         }
         rootMarker.done(root)
-        return builder.getTreeBuilt()
+        return builder.treeBuilt
     }
 }

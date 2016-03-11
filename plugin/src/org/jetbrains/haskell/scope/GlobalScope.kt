@@ -1,24 +1,19 @@
 package org.jetbrains.haskell.scope
 
-import org.jetbrains.haskell.fileType.HaskellFile
-import org.jetbrains.haskell.psi.ModuleName
-import org.jetbrains.haskell.util.ProcessRunner
-import java.util.HashMap
-import org.jetbrains.haskell.external.ghcfs.RamFile
-import com.intellij.psi.PsiManager
 import com.intellij.openapi.project.Project
-import org.jetbrains.haskell.util.joinPath
+import com.intellij.openapi.vfs.LocalFileSystem
+import com.intellij.openapi.vfs.VirtualFile
 import org.jetbrains.cabal.CabalInterface
-import java.io.File
+import org.jetbrains.haskell.fileType.HaskellFile
 import org.jetbrains.haskell.vfs.TarGzArchive
 import org.jetbrains.haskell.vfs.TarGzFile
-import com.intellij.openapi.vfs.VirtualFile
-import com.intellij.openapi.vfs.LocalFileSystem
+import java.io.File
+import java.util.*
 
 /**
  * Created by atsky on 12/9/14.
  */
-public object GlobalScope {
+object GlobalScope {
     val cache = HashMap<String, HaskellFile>()
 
     val tarCache = HashMap<String, TarGzArchive>()
@@ -57,15 +52,15 @@ public object GlobalScope {
 
     fun findSource(directory: File, project: Project, name: String) : VirtualFile? {
         for (file in directory.listFiles()) {
-            if (file.isDirectory()) {
+            if (file.isDirectory) {
                 val result = findSource(file, project, name)
                 if (result != null) {
                     return result
                 }
             } else {
-                val fileName = file.getName()
+                val fileName = file.name
                 if (fileName.endsWith(".tar.gz")) {
-                    val filePath = file.getAbsolutePath()
+                    val filePath = file.absolutePath
                     if (!tarCache.contains(filePath)) {
                         tarCache[filePath] = TarGzArchive(file)
                     }

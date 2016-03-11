@@ -3,16 +3,15 @@ package org.jetbrains.cabal.export
 import com.intellij.openapi.externalSystem.service.settings.AbstractImportFromExternalSystemControl
 import com.intellij.openapi.externalSystem.util.ExternalSystemSettingsControl
 import com.intellij.openapi.project.ProjectManager
-import com.intellij.openapi.util.text.StringUtil
 import org.jetbrains.cabal.settings.CabalProjectSettings
 import org.jetbrains.cabal.settings.CabalSettings
 import org.jetbrains.cabal.settings.CabalSettingsListener
-import org.jetbrains.cabal.util.*
+import org.jetbrains.cabal.util.SYSTEM_ID
 
-public class ImportFromCabalControl()
+class ImportFromCabalControl()
         : AbstractImportFromExternalSystemControl<CabalProjectSettings, CabalSettingsListener, CabalSettings>(
                 SYSTEM_ID,
-                CabalSettings(ProjectManager.getInstance()!!.getDefaultProject()),
+                CabalSettings(ProjectManager.getInstance()!!.defaultProject),
                 CabalProjectSettings(),
                 true
         ) {

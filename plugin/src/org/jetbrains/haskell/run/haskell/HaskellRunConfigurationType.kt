@@ -8,7 +8,7 @@ import com.intellij.openapi.project.Project
 import org.jetbrains.haskell.icons.HaskellIcons
 import javax.swing.*
 
-public class HaskellRunConfigurationType() : ConfigurationType {
+class HaskellRunConfigurationType() : ConfigurationType {
 
     private val myFactory: ConfigurationFactory
 
@@ -42,6 +42,6 @@ public class HaskellRunConfigurationType() : ConfigurationType {
 
     companion object {
 
-        public val INSTANCE: HaskellRunConfigurationType = HaskellRunConfigurationType()
+        val INSTANCE: HaskellRunConfigurationType = HaskellRunConfigurationType()
     }
 }

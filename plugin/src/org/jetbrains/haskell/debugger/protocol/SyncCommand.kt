@@ -1,12 +1,9 @@
 package org.jetbrains.haskell.debugger.protocol
 
-import org.jetbrains.haskell.debugger.parser.ParseResult
-import java.util.concurrent.locks.Lock
-import java.util.concurrent.locks.Condition
-import java.util.Deque
-import org.jetbrains.haskell.debugger.utils.SyncObject
-import org.jetbrains.haskell.debugger.parser.GHCiParser
 import org.jetbrains.haskell.debugger.parser.JSONConverter
+import org.jetbrains.haskell.debugger.parser.ParseResult
+import org.jetbrains.haskell.debugger.utils.SyncObject
+import java.util.*
 
 /**
  * Command that is used to make synchronous requests to debugger. Contains SyncObject. Before parsed result is handled
@@ -18,7 +15,7 @@ import org.jetbrains.haskell.debugger.parser.JSONConverter
  *
  * @author Habibullin Marat
  */
-public abstract class SyncCommand<T : ParseResult?>(private val syncObject: SyncObject, callback: CommandCallback<T>)
+abstract class SyncCommand<T : ParseResult?>(private val syncObject: SyncObject, callback: CommandCallback<T>)
 : AbstractCommand<T>(callback) {
     override fun handleGHCiOutput(output: Deque<String?>) {
         val result = parseGHCiOutput(output)

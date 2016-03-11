@@ -1,14 +1,13 @@
 package org.jetbrains.haskell.psi
 
 import com.intellij.lang.ASTNode
-import com.intellij.psi.util.PsiTreeUtil
-import com.intellij.psi.PsiNamedElement
 import com.intellij.psi.PsiElement
+import com.intellij.psi.PsiNamedElement
 
 /**
  * Created by atsky on 4/11/14.
  */
-public class ConstructorDeclaration(node : ASTNode) : Declaration(node), PsiNamedElement {
+class ConstructorDeclaration(node : ASTNode) : Declaration(node), PsiNamedElement {
 
     override fun getName(): String? = getDeclarationName()
 
@@ -21,7 +20,7 @@ public class ConstructorDeclaration(node : ASTNode) : Declaration(node), PsiName
     }
 
     override fun getDeclarationName(): String? {
-        return getTypeVariable()?.getText()
+        return getTypeVariable()?.text
     }
 
 }
