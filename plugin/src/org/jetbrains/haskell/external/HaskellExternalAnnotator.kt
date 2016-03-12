@@ -90,7 +90,7 @@ class HaskellExternalAnnotator() : ExternalAnnotator<PsiFile, List<ErrorMessage>
                 val path = matcher.group(1)!!
                 val line = Integer.parseInt(matcher.group(2)!!)
                 val col = Integer.parseInt(matcher.group(3)!!)
-                val msg = matcher.group(4)!!.replace("\u0000", "\n")
+                val msg = matcher.group(4)!!.replace("\u0000", "\n").trimStart()
                 val severity = if (msg.startsWith("Warning")) {
                     ErrorMessage.Severity.Warning
                 } else {
@@ -162,7 +162,7 @@ class HaskellExternalAnnotator() : ExternalAnnotator<PsiFile, List<ErrorMessage>
                 ErrorMessage.Severity.Error -> HighlightSeverity.ERROR
                 ErrorMessage.Severity.Warning -> HighlightSeverity.WARNING
             }
-            holder.createAnnotation(severity, textRange, error.text, text);
+            val annotation = holder.createAnnotation(severity, textRange, error.text, text);
         }
     }
 }

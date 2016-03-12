@@ -1,41 +1,37 @@
 package org.jetbrains.haskell.run.haskell
 
-import com.intellij.execution.CantRunException
-import com.intellij.execution.ExecutionException
+import com.intellij.execution.*
 import com.intellij.execution.configurations.CommandLineState
 import com.intellij.execution.configurations.GeneralCommandLine
-import com.intellij.execution.process.ProcessHandler
-import com.intellij.execution.runners.ExecutionEnvironment
-import java.io.File
-import org.jetbrains.haskell.util.joinPath
-import org.jetbrains.haskell.util.OSUtil
-import com.intellij.execution.Executor
-import com.intellij.execution.runners.ProgramRunner
-import com.intellij.execution.ExecutionResult
-import com.intellij.execution.DefaultExecutionResult
 import com.intellij.execution.configurations.RunnerSettings
-import org.jetbrains.haskell.util.GHCUtil
+import com.intellij.execution.process.OSProcessHandler
+import com.intellij.execution.process.ProcessHandler
+import com.intellij.execution.process.ProcessTerminatedListener
+import com.intellij.execution.runners.ExecutionEnvironment
+import com.intellij.execution.runners.ProgramRunner
+import com.intellij.openapi.module.Module
+import com.intellij.openapi.project.Project
 import com.intellij.openapi.roots.ModuleRootManager
+import com.intellij.openapi.vfs.CharsetToolkit
+import com.intellij.openapi.vfs.LocalFileSystem
+import com.pty4j.PtyProcess
+import org.jetbrains.cabal.CabalFile
+import org.jetbrains.cabal.CabalInterface
+import org.jetbrains.cabal.psi.Executable
+import org.jetbrains.cabal.psi.FullVersionConstraint
+import org.jetbrains.haskell.config.HaskellSettings
+import org.jetbrains.haskell.debugger.config.DebuggerType
+import org.jetbrains.haskell.debugger.config.HaskellDebugSettings
+import org.jetbrains.haskell.debugger.procdebuggers.utils.RemoteDebugStreamHandler
 import org.jetbrains.haskell.debugger.prochandlers.GHCiProcessHandler
 import org.jetbrains.haskell.debugger.prochandlers.HaskellDebugProcessHandler
-import org.jetbrains.haskell.debugger.procdebuggers.utils.RemoteDebugStreamHandler
-import org.jetbrains.cabal.CabalInterface
-import com.intellij.openapi.module.Module
-import org.jetbrains.cabal.CabalFile
-import org.jetbrains.cabal.psi.Executable
-import com.intellij.openapi.vfs.LocalFileSystem
-import org.jetbrains.haskell.debugger.config.HaskellDebugSettings
-import com.intellij.execution.process.ProcessTerminatedListener
-import com.intellij.execution.process.OSProcessHandler
-import com.pty4j.PtyProcess
-import org.jetbrains.haskell.config.HaskellSettings
-import org.jetbrains.cabal.psi.FullVersionConstraint
-import java.util.ArrayList
 import org.jetbrains.haskell.debugger.prochandlers.RemoteProcessHandler
-import com.intellij.openapi.vfs.CharsetToolkit
 import org.jetbrains.haskell.debugger.repl.DebugConsoleFactory
-import com.intellij.openapi.project.Project
-import org.jetbrains.haskell.debugger.config.DebuggerType
+import org.jetbrains.haskell.util.GHCUtil
+import org.jetbrains.haskell.util.OSUtil
+import org.jetbrains.haskell.util.joinPath
+import java.io.File
+import java.util.*
 
 class HaskellCommandLineState(environment: ExecutionEnvironment, val configuration: CabalRunConfiguration) : CommandLineState(environment) {
 
@@ -84,7 +80,6 @@ class HaskellCommandLineState(environment: ExecutionEnvironment, val configurati
     }
 
     private fun getExecutable(module: Module): Executable {
-
         val cabalFile = tryGetCabalFile(module) ?: throw ExecutionException("Error while starting debug process: cabal file not found")
         val exec = tryGetExecWithNameFromConfig(cabalFile) ?: throw ExecutionException("Error while starting debug process: cabal file does not contain executable ${configuration.myExecutableName}")
         return exec

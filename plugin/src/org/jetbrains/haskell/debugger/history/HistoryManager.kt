@@ -1,26 +1,24 @@
 package org.jetbrains.haskell.debugger.history
 
-import org.jetbrains.haskell.debugger.actions.SwitchableAction
-import com.intellij.openapi.actionSystem.AnActionEvent
 import com.intellij.execution.ui.RunnerLayoutUi
-import com.intellij.openapi.actionSystem.DefaultActionGroup
-import org.jetbrains.haskell.debugger.highlighting.HsExecutionPointHighlighter
-import com.intellij.ui.AppUIUtil
-import org.jetbrains.haskell.debugger.frames.HsStackFrame
-import java.util.ArrayList
-import org.jetbrains.haskell.debugger.frames.HsHistoryFrame
-import org.jetbrains.haskell.debugger.protocol.CommandCallback
-import org.jetbrains.haskell.debugger.parser.MoveHistResult
-import org.jetbrains.haskell.debugger.parser.HsStackFrameInfo
-import org.jetbrains.haskell.debugger.parser.HsHistoryFrameInfo
-import org.jetbrains.haskell.debugger.HaskellDebugProcess
 import com.intellij.icons.AllIcons.Actions
-import java.util.Deque
-import java.util.ArrayDeque
-import com.intellij.xdebugger.impl.ui.XDebuggerUIConstants
-import org.jetbrains.haskell.debugger.utils.SyncObject
-import com.intellij.xdebugger.impl.XDebugSessionImpl
+import com.intellij.openapi.actionSystem.AnActionEvent
+import com.intellij.openapi.actionSystem.DefaultActionGroup
+import com.intellij.ui.AppUIUtil
 import com.intellij.xdebugger.XDebugSession
+import com.intellij.xdebugger.impl.XDebugSessionImpl
+import com.intellij.xdebugger.impl.ui.XDebuggerUIConstants
+import org.jetbrains.haskell.debugger.HaskellDebugProcess
+import org.jetbrains.haskell.debugger.actions.SwitchableAction
+import org.jetbrains.haskell.debugger.frames.HsHistoryFrame
+import org.jetbrains.haskell.debugger.frames.HsStackFrame
+import org.jetbrains.haskell.debugger.highlighting.HsExecutionPointHighlighter
+import org.jetbrains.haskell.debugger.parser.HsHistoryFrameInfo
+import org.jetbrains.haskell.debugger.parser.HsStackFrameInfo
+import org.jetbrains.haskell.debugger.parser.MoveHistResult
+import org.jetbrains.haskell.debugger.protocol.CommandCallback
+import org.jetbrains.haskell.debugger.utils.SyncObject
+import java.util.*
 
 /**
  * Created by vlad on 8/5/14.
@@ -31,10 +29,10 @@ class HistoryManager(private val debugSession : XDebugSession,
     val HISTORY_SIZE: Int = 20
 
     class StackState(val historyIndex: Int,
-                            val realHistIndex: Int,
-                            val allFramesCollected: Boolean,
-                            val historyFrames: List<HsHistoryFrame>,
-                            val historyFramesLines: List<*>)
+                     val realHistIndex: Int,
+                     val allFramesCollected: Boolean,
+                     val historyFrames: List<HsHistoryFrame>,
+                     val historyFramesLines: List<*>)
 
 
     private val historyStack: HsHistoryStack = HsHistoryStack(debugProcess)
