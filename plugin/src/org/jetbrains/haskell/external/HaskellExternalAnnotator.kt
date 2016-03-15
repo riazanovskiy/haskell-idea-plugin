@@ -12,6 +12,7 @@ import com.intellij.openapi.vfs.VirtualFile
 import com.intellij.psi.PsiFile
 import com.intellij.xml.util.XmlStringUtil
 import org.jetbrains.haskell.config.HaskellSettings
+import org.jetbrains.haskell.intentions.LintIntention
 import org.jetbrains.haskell.util.LineColPosition
 import org.jetbrains.haskell.util.copyFile
 import org.jetbrains.haskell.util.getRelativePath
@@ -80,7 +81,7 @@ class HaskellExternalAnnotator() : ExternalAnnotator<PsiFile, List<ErrorMessage>
 
         val relativePath = getRelativePath(baseDir.path, file.path)
 
-        val result = ghcModi.runCommand("check $relativePath")
+        val result = ghcModi.runCommand("check $relativePath") + ghcModi.runCommand("lint $relativePath")
 
         val errors = ArrayList<ErrorMessage>()
 
@@ -144,25 +145,33 @@ class HaskellExternalAnnotator() : ExternalAnnotator<PsiFile, List<ErrorMessage>
 
     override fun apply(file: PsiFile, annotationResult: List<ErrorMessage>, holder: AnnotationHolder) {
         for (error in annotationResult) {
-
-            val start = LineColPosition(error.line, error.column).getOffset(file)
-            val end = LineColPosition(error.eLine, error.eColumn).getOffset(file)
-
-
-            val element = file.findElementAt(start)
-            val textRange = if (element != null) {
-                element.textRange
-            } else {
-                TextRange(start, end)
-            }
-
             val text = XmlStringUtil.wrapInHtml("<pre>" + XmlStringUtil.escapeString(error.text) + "</pre>")
 
             val severity = when (error.severity) {
                 ErrorMessage.Severity.Error -> HighlightSeverity.ERROR
                 ErrorMessage.Severity.Warning -> HighlightSeverity.WARNING
             }
+
+            val start = LineColPosition(error.line, error.column).getOffset(file)
+            val end = LineColPosition(error.eLine, error.eColumn).getOffset(file)
+
+            var element = file.findElementAt(start)
+
+            val matcher = Pattern.compile("Warning: ([^\n]+)\nFound:\n\\s+([^\n]+)\nWhy not:\n\\s+([^\n]+)").matcher(error.text)
+            if (matcher.matches()) {
+                while (!element!!.textMatches(matcher.group(2)))
+                    element = element.context
+            }
+
+            val textRange = if (element != null) {
+                element.textRange
+            } else {
+                TextRange(start, end)
+            }
+
             val annotation = holder.createAnnotation(severity, textRange, error.text, text);
+            if (matcher.matches())
+                annotation.registerFix(LintIntention(matcher.group(1), element, matcher.group(3)))
         }
     }
 }
