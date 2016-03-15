@@ -121,6 +121,8 @@
         <!-- Cabal -->
         <lang.syntaxHighlighterFactory key="Cabal"
                                        implementationClass="org.jetbrains.cabal.highlight.CabalHighlighterFactory"/>
+        <lang.commenter language="Cabal"
+                        implementationClass="org.jetbrains.haskell.comment.HaskellCommenter"/>
         <colorSettingsPage implementation="org.jetbrains.cabal.highlight.CabalColorsAndFontsPage"/>
         <lang.parserDefinition language="Cabal"
                                implementationClass="org.jetbrains.cabal.parser.CabalParserDefinition"/>
