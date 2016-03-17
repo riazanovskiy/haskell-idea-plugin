@@ -11,8 +11,7 @@ object HaskellElementFactory {
 
     fun createExpressionFromText(project: Project, name: String): PsiElement {
         val fileFromText = createFileFromText(project, name)
-        val expression = fileFromText.firstChild.firstChild.firstChild
-        return expression.firstChild
+        return fileFromText.firstChild.firstChild
     }
 
     fun createFileFromText(project: Project, text: String): HaskellFile {

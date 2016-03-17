@@ -159,8 +159,8 @@ class HaskellExternalAnnotator() : ExternalAnnotator<PsiFile, List<ErrorMessage>
 
             val matcher = Pattern.compile("Warning: ([^\n]+)\nFound:\n\\s+([^\n]+)\nWhy not:\n\\s+([^\n]+)").matcher(error.text)
             if (matcher.matches()) {
-                while (!element!!.textMatches(matcher.group(2)))
-                    element = element.context
+                while (!((element?.text ?: break)!!.replace(" ", "").equals(matcher.group(2).replace(" ", ""))))
+                    element = element!!.context
             }
 
             val textRange = if (element != null) {
