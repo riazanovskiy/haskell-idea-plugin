@@ -27,6 +27,7 @@ At this point the plugin provides these basic features:
 * Installation of cabal packages
 * Graphical debugger
 * REPL
+* quickfixes from hlint
 
 ### Plans
 
